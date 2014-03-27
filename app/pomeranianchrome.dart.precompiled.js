@@ -9064,7 +9064,7 @@ var $$ = {};
     call$1: [function(alarm) {
       var t1, t2, notificationOption, message, title, completer;
       t1 = $.get$notifications();
-      t2 = alarm.o.jsProxy._jsObject.name;
+      t2 = (alarm.o == null)?alarm.jsProxy._jsObject.name:alarm.o.jsProxy._jsObject.name;
       notificationOption = $.get$PomeranianNotificationOptions__notificationOptions().$index(0, t2);
       if (notificationOption == null) {
         if (J.$eq(t2, "Work")) {
