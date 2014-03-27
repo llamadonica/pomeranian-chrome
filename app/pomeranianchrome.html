@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!--
+*
+* <pomeranianchrome.html>
+* 
+* Copyright (c) 2014 "Adam Stark"
+* 
+* This file is part of Pomeranian Chrome.
+* 
+* Pomeranian Chrome is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* 
+*
+-->
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>PomeranianChrome</title>
+    <link rel="stylesheet" href="pomeranianchrome.css">
+  </head>
+  <body>
+    <h1 id="title_id">Pomeranian</h1>
+
+    <div id="timer_container_id">
+      <p id="timer_text_id"></p>
+    </div>
+    <div id="buttons_container_id">
+      <form id="timer_buttons">
+        <button class="focused" id="pomodoro_button_id">Pomodoro</button>
+        <button id="short_button_id">Short&nbsp;Break</button>
+        <button id="long_button_id">Long&nbsp;Break</button>
+        <button id="stop_button_id" style="display: none;">Stop</button>
+      </form>
+    </div>
+    
+    <script src="packages/browser/interop.js"></script>
+    <script src="packages/chrome/bootstrap.js"></script>
+<!--     <script src="pomeranianchrome.dart" type="application/dart"></script> -->
+    <script src="pomeranianchrome.dart.precompiled.js"></script>
+  </body>
+</html>
