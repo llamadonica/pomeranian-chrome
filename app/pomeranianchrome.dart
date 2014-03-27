@@ -35,6 +35,8 @@ import 'dart:html';
  * * http://developer.chrome.com/apps/api_index.html
  */
 void main() {
+  //TODO: I'm not sure if alarm should be persisted in this way. It seems
+  //like I'm mixing concerns.
   new pomeranian.View(
           new pomeranian.Controller(currentAlarm),
           chrome.app.window.current(),

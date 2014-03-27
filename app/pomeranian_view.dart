@@ -39,10 +39,29 @@ class View {
   pomeranian.Button _focusButton = pomeranian.Button.POMODORO;
   int _buttonsContainerWidth = 530;
   
-  int _lastAction = 0;
+  int _lastActionSync = 0;
+  int get _lastAction => _lastActionSync;
+  set _lastAction (int value) {
+    _lastActionSync = value;
+    _setLastAction(value);
+  }
+  
+  Future<bool> _getLocalStorage() => 
+      chrome.storage.local.get({'lastAction':0,'wasRunningWhenClosed':false})
+          .then((map) {
+            _lastActionSync = map['lastAction'];
+            return map['wasRunningWhenClosed'];
+          });
+  
+  Future _setLastAction(int value) =>
+      chrome.storage.local.set({'lastAction':value});
+  Future _setWasRunningWhenClosed(bool value) =>
+        chrome.storage.local.set({'wasRunningWhenClosed':value});
+  
   pomeranian.Button _lastButton = pomeranian.Button.POMODORO;
   String currentlyHighlighted = "#pomodoro_button_id";
   
+  //TODO: This could probably be done as a simple property instead.
   pomeranian.Button get nextButton {
     if (_lastAction > 7) _lastAction %= 8;
     switch (_lastAction) {
@@ -63,9 +82,15 @@ class View {
   pomeranian.Pointer<pomeranian.ViewAnimation> currentAnimation = new pomeranian.Pointer();
   
   View(pomeranian.Controller this._app, chrome.AppWindow this._window, Window this._jsWindow,[chrome.Alarm alarm = null]) {
+    bool isRunning = false;
     if (alarm != null) {
       presetAlarmState(alarm);
+      _setWasRunningWhenClosed(isRunning = true);
     }
+    this._getLocalStorage().then((_) {
+      highlightNextButton();
+    });
+    
     _app.onRaise.listen((_) => _window.focus());
     _app.onAlarm.listen((_) => toStopState());
     _jsWindow.onResize.listen(this.resizeWindow);
@@ -154,6 +179,7 @@ class View {
       eventName = "Long Break";
     }
     _jsWindow.document.querySelector("#title_id").text = eventName;
+    _setWasRunningWhenClosed(true);
     _app.setAlarm(delayInMinutes, name: eventName);
     timerLoop();
   }
@@ -217,6 +243,7 @@ class View {
                   focusButton: _lastButton,
                   isGoingToStop: false);
     }
+    _setWasRunningWhenClosed(false);
     animateNow().then(nextAnimation.drawFirstFrame);
     highlightNextButton();
     _jsWindow.document.querySelector("#title_id").text = "Pomeranian";
@@ -260,6 +287,7 @@ class View {
     });
   }
   
+  //TODO: This doesn't really belong here.
   static void absolutizeElements (Iterable<Element> collection) {
     List<Bounds> bounds = new List();
     for (Element element in collection) {
@@ -288,6 +316,9 @@ class View {
           boundsIterator.current.top.toString() + "px";
     }
   }
+  
+  //TODO: I thought this would make things clearer in general,
+  //but I think it just confuses things.
   Future<num> animateNow() {
     if (currentAnimation.data == null) {
       return _jsWindow.animationFrame;

@@ -47,6 +47,7 @@ void onNotificationClicked (String notification) {
 }
 
 void onLaunch ([chrome.LaunchData launchData = null]) {
+    //TODO: Use chrome APIs to discover OS.
     bool isWindows = ((new RegExp(r'Windows')).hasMatch(window.navigator.userAgent));
     String frame = isWindows?'chrome':'chrome';
     chrome.WindowType type = isWindows?chrome.WindowType.SHELL:chrome.WindowType.PANEL;
@@ -68,6 +69,8 @@ void onLaunch ([chrome.LaunchData launchData = null]) {
             alwaysOnTop: true
             )).then((appWindow) {
               windowIsActive = true;
+              //TODO: This needs to be more thoroughly validated, since I'm not
+              //sure whether it's possible to miss an alarm here.
               appWindow.jsProxy['alarm'] = notificationAlarm;
               appWindow.onClosed.listen((_) {
                 windowIsActive = false;
