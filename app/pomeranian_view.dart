@@ -45,7 +45,6 @@ class View {
     _lastActionSync = value;
     _setLastAction(value);
   }
-  
   Future<bool> _getLocalStorage() => 
       chrome.storage.local.get({'lastAction':0,'wasRunningWhenClosed':false})
           .then((map) {
@@ -78,6 +77,23 @@ class View {
         return pomeranian.Button.LONG_BREAK;
     }
   }
+  
+  int _timerLoopFrame;
+  Future<double> get timerLoopAnimationFrame {
+    if (_timerLoopFrame != null) _jsWindow.cancelAnimationFrame(_timerLoopFrame);
+    var completer = new Completer<num>.sync();
+    _timerLoopFrame = _jsWindow.requestAnimationFrame((time) {
+      _timerLoopFrame = null;
+      completer.complete(time);
+    });
+    return completer.future;
+  }
+  void cancelTimerLoopAnimationFrame () {
+    if (_timerLoopFrame == null) return;
+    _jsWindow.cancelAnimationFrame(_timerLoopFrame);
+    _timerLoopFrame = null;
+  }
+  Timer _redrawClockTimer;
   
   pomeranian.Pointer<pomeranian.ViewAnimation> currentAnimation = new pomeranian.Pointer();
   
@@ -191,9 +207,9 @@ class View {
     var newTime = _app.timeout.difference(new DateTime.now()).inSeconds;
     if (newTime != previousTime) {
       previousTime = newTime;
-      _jsWindow.animationFrame.then(redrawClock);
+      timerLoopAnimationFrame.then(redrawClock);
     }
-    new Timer(new Duration(milliseconds:100), timerLoop);
+    _redrawClockTimer = new Timer(new Duration(milliseconds:100), timerLoop);
   }
   
   void redrawClock (double clock) {
@@ -218,10 +234,10 @@ class View {
     currentlyHighlighted = nextHighlight;
   }
   void toStopState() {
-    _jsWindow
-      .document
-      .querySelector("#timer_text_id")
-      .text = "Stopped";
+    if (_redrawClockTimer != null) {
+      _redrawClockTimer.cancel();
+      _redrawClockTimer = null;
+    }
     var nextAnimation;
     if (this.currentAnimation.data != null &&
                      this.currentAnimation.data is pomeranian.TransitionButtonsAnimation) {
@@ -246,7 +262,10 @@ class View {
     _setWasRunningWhenClosed(false);
     animateNow().then(nextAnimation.drawFirstFrame);
     highlightNextButton();
-    _jsWindow.document.querySelector("#title_id").text = "Pomeranian";
+    timerLoopAnimationFrame.then((_) {
+      _jsWindow.document.querySelector("#title_id").text = "Pomeranian";
+      _jsWindow.document.querySelector("#timer_text_id").text = "Stopped";
+    });
   }
   
   void clickStop(Event event) {

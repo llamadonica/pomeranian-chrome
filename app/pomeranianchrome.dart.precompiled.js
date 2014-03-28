@@ -1529,6 +1529,25 @@ var $$ = {};
   },
   TimerImpl: {
     "^": "Object;_once,_inEventLoop,_handle",
+    cancel$0: [function() {
+      var t1, t2, t3;
+      t1 = $.get$globalThis();
+      if (t1.setTimeout != null) {
+        if (this._inEventLoop)
+          throw H.wrapException(P.UnsupportedError$("Timer in event loop cannot be canceled."));
+        t2 = this._handle;
+        if (t2 == null)
+          return;
+        t3 = init.globalState.topEventLoop;
+        t3.activeTimerCount = t3.activeTimerCount - 1;
+        if (this._once)
+          t1.clearTimeout(t2);
+        else
+          t1.clearInterval(t2);
+        this._handle = null;
+      } else
+        throw H.wrapException(P.UnsupportedError$("Canceling a timer."));
+    }, "call$0", "get$cancel", 0, 0, null],
     TimerImpl$2: function(milliseconds, callback) {
       var t1, t2;
       if (milliseconds === 0)
@@ -9064,7 +9083,7 @@ var $$ = {};
     call$1: [function(alarm) {
       var t1, t2, notificationOption, message, title, completer;
       t1 = $.get$notifications();
-      t2 = (alarm.o == null)?alarm.jsProxy._jsObject.name:alarm.o.jsProxy._jsObject.name;
+      t2 = J.get$name$x(alarm);
       notificationOption = $.get$PomeranianNotificationOptions__notificationOptions().$index(0, t2);
       if (notificationOption == null) {
         if (J.$eq(t2, "Work")) {
@@ -9108,7 +9127,7 @@ var $$ = {};
 ["pomeranian_view", "pomeranian_view.dart", , R, {
   "^": "",
   View: {
-    "^": "Object;_pomeranian_view$_window,_jsWindow,_app,_focusButton,_buttonsContainerWidth,_lastActionSync,_lastButton,currentlyHighlighted,currentAnimation,previousTime",
+    "^": "Object;_pomeranian_view$_window,_jsWindow,_app,_focusButton,_buttonsContainerWidth,_lastActionSync,_lastButton,currentlyHighlighted,_timerLoopFrame,_redrawClockTimer,currentAnimation,previousTime",
     _getLocalStorage$0: [function() {
       var t1, t2, completer;
       $.get$storage().toString;
@@ -9144,6 +9163,21 @@ var $$ = {};
           return C.Button_2;
       }
     },
+    get$timerLoopAnimationFrame: function() {
+      var t1, t2, completer;
+      t1 = this._timerLoopFrame;
+      if (t1 != null) {
+        t2 = this._jsWindow;
+        C.Window_methods._ensureRequestAnimationFrame$0(t2);
+        t2.cancelAnimationFrame(t1);
+      }
+      t1 = J.JSNumber;
+      completer = H.setRuntimeTypeInfo(new P._SyncCompleter(P._Future$(t1)), [t1]);
+      t1 = this._jsWindow;
+      C.Window_methods._ensureRequestAnimationFrame$0(t1);
+      this._timerLoopFrame = C.Window_methods._requestAnimationFrame$1(t1, W._wrapZone(new R.View_timerLoopAnimationFrame_closure(this, completer)));
+      return completer.future;
+    },
     clickAction$1: [function(button) {
       return new R.View_clickAction_closure(this, button);
     }, "call$1", "get$clickAction", 2, 0, null, 217, []],
@@ -9156,9 +9190,9 @@ var $$ = {};
       newTime = C.JSNumber_methods._tdivFast$1(P.Duration$(0, 0, 0, t1.millisecondsSinceEpoch - t2.millisecondsSinceEpoch, 0, 0)._duration, 1000000);
       if (newTime !== this.previousTime) {
         this.previousTime = newTime;
-        C.Window_methods.get$animationFrame(this._jsWindow).then$1(this.get$redrawClock());
+        this.get$timerLoopAnimationFrame().then$1(this.get$redrawClock());
       }
-      P.Timer_Timer(P.Duration$(0, 0, 0, 100, 0, 0), this.get$timerLoop());
+      this._redrawClockTimer = P.Timer_Timer(P.Duration$(0, 0, 0, 100, 0, 0), this.get$timerLoop());
     }, "call$0", "get$timerLoop", 0, 0, 105],
     redrawClock$1: [function(clock) {
       var t1, previousMinutes, previousSeconds, secondsText;
@@ -9182,25 +9216,29 @@ var $$ = {};
     }, "call$0", "get$highlightNextButton", 0, 0, null],
     toStopState$0: [function() {
       var t1, t2, t3, t4, t5, t6, nextAnimation;
-      t1 = this._jsWindow;
-      t1.document.querySelector("#timer_text_id").textContent = "Stopped";
-      t2 = this.currentAnimation;
-      t3 = t2._data;
-      if (t3 != null) {
-        t4 = J.getInterceptor(t3);
-        t4 = typeof t3 === "object" && t3 !== null && !!t4.$isTransitionButtonsAnimation;
+      t1 = this._redrawClockTimer;
+      if (t1 != null) {
+        t1.cancel$0();
+        this._redrawClockTimer = null;
+      }
+      t1 = this.currentAnimation;
+      t2 = t1._data;
+      if (t2 != null) {
+        t3 = J.getInterceptor(t2);
+        t3 = typeof t2 === "object" && t2 !== null && !!t3.$isTransitionButtonsAnimation;
       } else
-        t4 = false;
+        t3 = false;
+      t4 = this._jsWindow;
       t5 = this._buttonsContainerWidth;
       t6 = this._lastButton;
-      nextAnimation = t4 ? K.TransitionButtonsAnimation$(t1, t2, 400, t5, null, t6, false, new R.View_toStopState_closure(t3)) : K.TransitionButtonsAnimation$(t1, t2, 400, t5, null, t6, false, null);
+      nextAnimation = t3 ? K.TransitionButtonsAnimation$(t4, t1, 400, t5, null, t6, false, new R.View_toStopState_closure(t2)) : K.TransitionButtonsAnimation$(t4, t1, 400, t5, null, t6, false, null);
       $.get$storage().toString;
-      t2 = J.$index$asx(J.$index$asx($.get$chrome(), "storage"), "local");
-      t2 = t2 == null ? null : new N.LocalStorageArea(t2);
-      t2.set$1(H.fillLiteralMap(["wasRunningWhenClosed", false], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
+      t1 = J.$index$asx(J.$index$asx($.get$chrome(), "storage"), "local");
+      t1 = t1 == null ? null : new N.LocalStorageArea(t1);
+      t1.set$1(H.fillLiteralMap(["wasRunningWhenClosed", false], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
       this.animateNow$0().then$1(nextAnimation.get$drawFirstFrame());
       this.highlightNextButton$0();
-      t1.document.querySelector("#title_id").textContent = "Pomeranian";
+      this.get$timerLoopAnimationFrame().then$1(new R.View_toStopState_closure0(this));
     }, "call$0", "get$toStopState", 0, 0, null],
     clickStop$1: [function($event) {
       var t1, t2;
@@ -9297,7 +9335,7 @@ var $$ = {};
       H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._html$_target, t1._eventType, W._wrapZone(new R.View_closure2(this)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
     },
     static: {View$: function(_app, _window, _jsWindow, alarm) {
-        var t1 = new R.View(_window, _jsWindow, _app, C.Button_0, 530, 0, C.Button_0, "#pomodoro_button_id", new K.Pointer(null, P.StreamController_StreamController$broadcast(null, null, false, null)), 0);
+        var t1 = new R.View(_window, _jsWindow, _app, C.Button_0, 530, 0, C.Button_0, "#pomodoro_button_id", null, null, new K.Pointer(null, P.StreamController_StreamController$broadcast(null, null, false, null)), 0);
         t1.View$4(_app, _window, _jsWindow, alarm);
         return t1;
       }, View_absolutizeElements: [function(collection) {
@@ -9332,6 +9370,18 @@ var $$ = {};
       this.this_0._lastActionSync = t1.$index(map, "lastAction");
       return t1.$index(map, "wasRunningWhenClosed");
     }, "call$1", null, 2, 0, null, 161, [], "call"],
+    $isFunction: true
+  },
+  View_timerLoopAnimationFrame_closure: {
+    "^": "Closure:82;this_0,completer_1",
+    call$1: [function(time) {
+      var t1;
+      this.this_0._timerLoopFrame = null;
+      t1 = this.completer_1.future;
+      if (t1._state !== 0)
+        H.throwExpression(new P.StateError("Future already completed"));
+      t1._complete$1(time);
+    }, "call$1", null, 2, 0, null, 169, [], "call"],
     $isFunction: true
   },
   View_closure: {
@@ -9469,6 +9519,15 @@ var $$ = {};
     call$1: [function(time) {
       return 1 - this.prevAnimation_0.positionAtTime$1(time);
     }, "call$1", null, 2, 0, null, 169, [], "call"],
+    $isFunction: true
+  },
+  View_toStopState_closure0: {
+    "^": "Closure:82;this_1",
+    call$1: [function(_) {
+      var t1 = this.this_1._jsWindow;
+      t1.document.querySelector("#title_id").textContent = "Pomeranian";
+      t1.document.querySelector("#timer_text_id").textContent = "Stopped";
+    }, "call$1", null, 2, 0, null, 183, [], "call"],
     $isFunction: true
   },
   View_resizeWindow_closure: {
@@ -16903,7 +16962,7 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Controller_closure0.prototype = $desc;
-  function View(_pomeranian_view$_window, _jsWindow, _app, _focusButton, _buttonsContainerWidth, _lastActionSync, _lastButton, currentlyHighlighted, currentAnimation, previousTime) {
+  function View(_pomeranian_view$_window, _jsWindow, _app, _focusButton, _buttonsContainerWidth, _lastActionSync, _lastButton, currentlyHighlighted, _timerLoopFrame, _redrawClockTimer, currentAnimation, previousTime) {
     this._pomeranian_view$_window = _pomeranian_view$_window;
     this._jsWindow = _jsWindow;
     this._app = _app;
@@ -16912,6 +16971,8 @@ function dart_precompiled($collectedClasses) {
     this._lastActionSync = _lastActionSync;
     this._lastButton = _lastButton;
     this.currentlyHighlighted = currentlyHighlighted;
+    this._timerLoopFrame = _timerLoopFrame;
+    this._redrawClockTimer = _redrawClockTimer;
     this.currentAnimation = currentAnimation;
     this.previousTime = previousTime;
   }
@@ -16932,6 +16993,17 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   View__getLocalStorage_closure.prototype = $desc;
+  function View_timerLoopAnimationFrame_closure(this_0, completer_1) {
+    this.this_0 = this_0;
+    this.completer_1 = completer_1;
+  }
+  View_timerLoopAnimationFrame_closure.builtin$cls = "View_timerLoopAnimationFrame_closure";
+  if (!"name" in View_timerLoopAnimationFrame_closure)
+    View_timerLoopAnimationFrame_closure.name = "View_timerLoopAnimationFrame_closure";
+  $desc = $collectedClasses.View_timerLoopAnimationFrame_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  View_timerLoopAnimationFrame_closure.prototype = $desc;
   function View_closure(this_0) {
     this.this_0 = this_0;
   }
@@ -17003,6 +17075,16 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   View_toStopState_closure.prototype = $desc;
+  function View_toStopState_closure0(this_1) {
+    this.this_1 = this_1;
+  }
+  View_toStopState_closure0.builtin$cls = "View_toStopState_closure0";
+  if (!"name" in View_toStopState_closure0)
+    View_toStopState_closure0.name = "View_toStopState_closure0";
+  $desc = $collectedClasses.View_toStopState_closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  View_toStopState_closure0.prototype = $desc;
   function View_resizeWindow_closure(timerText_0, computedMarginTop_1, computedMarginBottom_2) {
     this.timerText_0 = timerText_0;
     this.computedMarginTop_1 = computedMarginTop_1;
@@ -17147,5 +17229,5 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Button.prototype = $desc;
-  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, IFrameElement, ImageData, ImageElement, InputElement, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, Performance, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, _Attr, _DocumentType, _Entity, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, KeyRange, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedLength, AnimatedNumberList, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgDocument, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGAnimateColorElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, JSInvocationMirror, ReflectionInfo, Primitives_functionNoSuchMethod_closure, Primitives_applyFunction_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, CastErrorImplementation, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, initHooks_closure, initHooks_closure0, initHooks_closure1, Animation, Animation_stop_closure, Pair, ChromeAlarms, ChromeAlarms$__closure, Alarm, AlarmCreateInfo, ChromeApp, ChromeAppRuntime, ChromeAppRuntime$__closure, LaunchData, _ChromeAppWindow, _ChromeAppWindow$__closure, _AppWindow, ChromeAppWindow, AppWindow, ChromeNotifications, ChromeNotifications$__closure, OnClosedEvent, OnButtonClickedEvent, TemplateType, PermissionLevel, NotificationOptions, _createPermissionLevel_closure, ChromeCompleter, ChromeCompleter$noArgs_closure, ChromeCompleter$oneArg_closure, ChromeStreamController, ChromeStreamController$noArgs_closure, ChromeStreamController$oneArg_closure, ChromeStreamController$twoArgs_closure, ChromeObject, ChromeApi, ChromeEnum, Bounds0, ChromeStorage, ChromeStorage$__closure, StorageOnChangedEvent, LocalStorageArea, StorageArea, ListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, WhereIterable, WhereIterator, FixedLengthListMixin, Symbol0, _AsyncError, _BroadcastStream, _BroadcastSubscription, _BroadcastStreamController, _SyncBroadcastStreamController, _SyncBroadcastStreamController__sendData_closure, _SyncBroadcastStreamController__sendError_closure, _AsyncBroadcastStreamController, Future, _Completer, _AsyncCompleter, _SyncCompleter, _Future, _Future__addListener_closure, _Future__chainFutures_closure, _Future__chainFutures_closure0, _Future__asyncComplete_closure, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, StreamSubscription, EventSink, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _NoCallbacks, _NoCallbackAsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _NoCallbackSyncStreamController, _StreamController__SyncStreamControllerDispatch, _ControllerStream, _ControllerSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendError_sendError, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedError, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _ForwardingStream, _ForwardingStreamSubscription, _MapStream, _BaseZone, _BaseZone_bindCallback_closure, _BaseZone_bindCallback_closure0, _BaseZone_bindUnaryCallback_closure, _BaseZone_bindUnaryCallback_closure0, _rootHandleUncaughtError_closure, _rootHandleUncaughtError__closure, _RootZone, _HashMap, _HashMap_values_closure, _IdentityHashMap, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _HashSet, _IdentityHashSet, HashSetIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, _convertJsonToDart_closure, _convertJsonToDart_walk, Codec, Converter, JsonCodec, JsonDecoder, Function__toMangledNames_closure, NoSuchMethodError_toString_closure, DateTime, DateTime_toString_fourDigits, DateTime_toString_threeDigits, DateTime_toString_twoDigits, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, NoSuchMethodError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Iterator, Map, Null, Object, StackTrace, StringBuffer, Symbol, Interceptor_CssStyleDeclarationBase, _CssStyleDeclarationSet, Object_CssStyleDeclarationBase, _CssStyleDeclarationSet_closure, _CssStyleDeclarationSet_setProperty_closure, CssStyleDeclarationBase, _FrozenElementList, _FrozenElementList$_wrap_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Window_animationFrame_closure, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _ElementCssClassSet, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, _DOMWindowCrossFrame, _AttributeClassSet, Capability, JsObject, JsObject__convertDataTree__convert, JsFunction, JsArray, JsObject_ListMixin, _convertToJS_closure, _convertToJS_closure0, _wrapToDart_closure, _wrapToDart_closure0, _wrapToDart_closure1, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0, EasingCurve, _BezierGen, _BezierGen_addMatrix_closure, CssClassSetImpl, CssClassSetImpl_add_closure, Controller, Controller_closure, Controller_closure0, View, View__getLocalStorage_closure, View_closure, View_closure0, View_closure1, View_closure2, View_clickAction_closure, View_clickAction__closure, View_toStopState_closure, View_resizeWindow_closure, View_animateNow_closure, Bounds, ViewAnimation, ResizeAnimation, TransitionButtonsAnimation, TransitionButtonsAnimation_closure, Pointer, Enum, Button];
+  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, IFrameElement, ImageData, ImageElement, InputElement, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, Performance, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, _Attr, _DocumentType, _Entity, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, KeyRange, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedLength, AnimatedNumberList, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgDocument, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGAnimateColorElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, JSInvocationMirror, ReflectionInfo, Primitives_functionNoSuchMethod_closure, Primitives_applyFunction_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, CastErrorImplementation, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, initHooks_closure, initHooks_closure0, initHooks_closure1, Animation, Animation_stop_closure, Pair, ChromeAlarms, ChromeAlarms$__closure, Alarm, AlarmCreateInfo, ChromeApp, ChromeAppRuntime, ChromeAppRuntime$__closure, LaunchData, _ChromeAppWindow, _ChromeAppWindow$__closure, _AppWindow, ChromeAppWindow, AppWindow, ChromeNotifications, ChromeNotifications$__closure, OnClosedEvent, OnButtonClickedEvent, TemplateType, PermissionLevel, NotificationOptions, _createPermissionLevel_closure, ChromeCompleter, ChromeCompleter$noArgs_closure, ChromeCompleter$oneArg_closure, ChromeStreamController, ChromeStreamController$noArgs_closure, ChromeStreamController$oneArg_closure, ChromeStreamController$twoArgs_closure, ChromeObject, ChromeApi, ChromeEnum, Bounds0, ChromeStorage, ChromeStorage$__closure, StorageOnChangedEvent, LocalStorageArea, StorageArea, ListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, WhereIterable, WhereIterator, FixedLengthListMixin, Symbol0, _AsyncError, _BroadcastStream, _BroadcastSubscription, _BroadcastStreamController, _SyncBroadcastStreamController, _SyncBroadcastStreamController__sendData_closure, _SyncBroadcastStreamController__sendError_closure, _AsyncBroadcastStreamController, Future, _Completer, _AsyncCompleter, _SyncCompleter, _Future, _Future__addListener_closure, _Future__chainFutures_closure, _Future__chainFutures_closure0, _Future__asyncComplete_closure, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, StreamSubscription, EventSink, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _NoCallbacks, _NoCallbackAsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _NoCallbackSyncStreamController, _StreamController__SyncStreamControllerDispatch, _ControllerStream, _ControllerSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendError_sendError, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedError, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _ForwardingStream, _ForwardingStreamSubscription, _MapStream, _BaseZone, _BaseZone_bindCallback_closure, _BaseZone_bindCallback_closure0, _BaseZone_bindUnaryCallback_closure, _BaseZone_bindUnaryCallback_closure0, _rootHandleUncaughtError_closure, _rootHandleUncaughtError__closure, _RootZone, _HashMap, _HashMap_values_closure, _IdentityHashMap, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _HashSet, _IdentityHashSet, HashSetIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, _convertJsonToDart_closure, _convertJsonToDart_walk, Codec, Converter, JsonCodec, JsonDecoder, Function__toMangledNames_closure, NoSuchMethodError_toString_closure, DateTime, DateTime_toString_fourDigits, DateTime_toString_threeDigits, DateTime_toString_twoDigits, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, NoSuchMethodError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Iterator, Map, Null, Object, StackTrace, StringBuffer, Symbol, Interceptor_CssStyleDeclarationBase, _CssStyleDeclarationSet, Object_CssStyleDeclarationBase, _CssStyleDeclarationSet_closure, _CssStyleDeclarationSet_setProperty_closure, CssStyleDeclarationBase, _FrozenElementList, _FrozenElementList$_wrap_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Window_animationFrame_closure, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _ElementCssClassSet, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, _DOMWindowCrossFrame, _AttributeClassSet, Capability, JsObject, JsObject__convertDataTree__convert, JsFunction, JsArray, JsObject_ListMixin, _convertToJS_closure, _convertToJS_closure0, _wrapToDart_closure, _wrapToDart_closure0, _wrapToDart_closure1, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0, EasingCurve, _BezierGen, _BezierGen_addMatrix_closure, CssClassSetImpl, CssClassSetImpl_add_closure, Controller, Controller_closure, Controller_closure0, View, View__getLocalStorage_closure, View_timerLoopAnimationFrame_closure, View_closure, View_closure0, View_closure1, View_closure2, View_clickAction_closure, View_clickAction__closure, View_toStopState_closure, View_toStopState_closure0, View_resizeWindow_closure, View_animateNow_closure, Bounds, ViewAnimation, ResizeAnimation, TransitionButtonsAnimation, TransitionButtonsAnimation_closure, Pointer, Enum, Button];
 }
