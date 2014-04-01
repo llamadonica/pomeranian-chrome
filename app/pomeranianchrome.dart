@@ -35,13 +35,17 @@ import 'dart:html';
  * * http://developer.chrome.com/apps/api_index.html
  */
 void main() {
-  //TODO: I'm not sure if alarm should be persisted in this way. It seems
-  //like I'm mixing concerns.
-  new pomeranian.View(
-          new pomeranian.Controller(currentAlarm),
+  var controller = new pomeranian.Controller(currentAlarm);
+  window.onLoad.listen((_) {
+    viewIsReady = true;
+  });
+  controller.syncLocalStorage().then((_) =>
+    new pomeranian.View(
+          controller,
           chrome.app.window.current(),
           window,
-          currentAlarm);
+          viewIsReady));
 }
 
+bool viewIsReady = false;
 chrome.Alarm get currentAlarm => chrome.app.window.current().jsProxy['alarm'];

@@ -27,43 +27,64 @@ import 'dart:async';
 import 'package:chrome/chrome_app.dart' as chrome;
 import 'pomeranian_controller.dart' as pomeranian;
 import 'pomeranian_window_animation.dart' as pomeranian;
+import 'generic_view.dart' as generic;
 
 
 typedef void ClickHandlerFunction(Event event);
+typedef void AnimationCallback(double time);
 
-class View {
+class View implements generic.AnimatableView {
   final chrome.AppWindow _window;
   final Window _jsWindow;
   final pomeranian.Controller _app;
+  
+  //TODO: Double up on animation frames so that one animation
+  //frame and one timer loop frame can be called at a time.
+  @override generic.AnimationFrame requestAnimationFrame() {
+    return new generic.WindowAnimationFrame(_jsWindow);
+  }
+  Future<generic.AnimationFrame> requestFirstAnimationFrame() {
+    if (_currentAnimation.data == null) {
+      return new Future.sync(requestAnimationFrame);
+    }
+    else {
+      return _currentAnimation.data.stop().then((innerTime) =>
+        new generic.WindowAnimationFrame(_jsWindow));
+    }
+  }
+  
+  
+  
+  /*
+  @override void cancelAnimationFrame(int id) =>
+      _jsWindow.cancelAnimationFrame(id);
+  
+  @override Future<double> get animationFrame {
+    if (_currentAnimation.data == null) {
+      return _jsWindow.animationFrame;
+    } else {
+      return _currentAnimation.data.stop().then((innerTime) =>
+        _jsWindow.animationFrame);
+    }
+  }
+  */
+  @override Document get document =>
+      _jsWindow.document;
+  @override double now() =>
+      _jsWindow.performance.now();
     
   pomeranian.Button _focusButton = pomeranian.Button.POMODORO;
-  int _buttonsContainerWidth = 530;
-  
-  int _lastActionSync = 0;
-  int get _lastAction => _lastActionSync;
-  set _lastAction (int value) {
-    _lastActionSync = value;
-    _setLastAction(value);
-  }
-  Future<bool> _getLocalStorage() => 
-      chrome.storage.local.get({'lastAction':0,'wasRunningWhenClosed':false})
-          .then((map) {
-            _lastActionSync = map['lastAction'];
-            return map['wasRunningWhenClosed'];
-          });
-  
-  Future _setLastAction(int value) =>
-      chrome.storage.local.set({'lastAction':value});
-  Future _setWasRunningWhenClosed(bool value) =>
-        chrome.storage.local.set({'wasRunningWhenClosed':value});
-  
   pomeranian.Button _lastButton = pomeranian.Button.POMODORO;
-  String currentlyHighlighted = "#pomodoro_button_id";
+  int _buttonsContainerWidth = 530;
+  String _currentlyHighlightedButton = "#pomodoro_button_id";
+  int _timerLoopFrame;
+  Timer _redrawClockTimer;
+  int _previousTime = 0;
   
-  //TODO: This could probably be done as a simple property instead.
-  pomeranian.Button get nextButton {
-    if (_lastAction > 7) _lastAction %= 8;
-    switch (_lastAction) {
+  pomeranian.Pointer<pomeranian.ViewAnimation> _currentAnimation = new pomeranian.Pointer();
+  pomeranian.Button get _nextButton {
+    if (_app.lastAction > 7) _app.lastAction %= 8;
+    switch (_app.lastAction) {
       case 0:
       case 2:
       case 4:
@@ -78,238 +99,37 @@ class View {
     }
   }
   
-  int _timerLoopFrame;
-  Future<double> get timerLoopAnimationFrame {
-    if (_timerLoopFrame != null) _jsWindow.cancelAnimationFrame(_timerLoopFrame);
-    var completer = new Completer<num>.sync();
-    _timerLoopFrame = _jsWindow.requestAnimationFrame((time) {
-      _timerLoopFrame = null;
-      completer.complete(time);
-    });
-    return completer.future;
-  }
-  void cancelTimerLoopAnimationFrame () {
-    if (_timerLoopFrame == null) return;
-    _jsWindow.cancelAnimationFrame(_timerLoopFrame);
-    _timerLoopFrame = null;
-  }
-  Timer _redrawClockTimer;
+  generic.AnimationFrame __timerLoopAnimationFrame;
   
-  pomeranian.Pointer<pomeranian.ViewAnimation> currentAnimation = new pomeranian.Pointer();
-  
-  View(pomeranian.Controller this._app, chrome.AppWindow this._window, Window this._jsWindow,[chrome.Alarm alarm = null]) {
-    bool isRunning = false;
-    if (alarm != null) {
-      presetAlarmState(alarm);
-      _setWasRunningWhenClosed(isRunning = true);
-    }
-    this._getLocalStorage().then((_) {
-      highlightNextButton();
+  generic.AnimationFrame get _timerLoopAnimationFrame {
+    if (__timerLoopAnimationFrame != null) __timerLoopAnimationFrame.cancel();
+    __timerLoopAnimationFrame = new generic.WindowAnimationFrame(_jsWindow);
+    __timerLoopAnimationFrame.onExpire.listen((_) {
+      __timerLoopAnimationFrame = null;
     });
+    return __timerLoopAnimationFrame;
     
+  }
+  void _cancelTimerLoopAnimationFrame () => __timerLoopAnimationFrame.cancel();
+  
+  View(pomeranian.Controller this._app, chrome.AppWindow this._window, Window this._jsWindow, [bool viewIsReady = false]) {
+    if (!_app.stopped) {
+      _presetAlarmState();
+    } else {
+      document.querySelector("#timer_text_id").text = "Stopped";
+    }
+    _highlightNextButton();
     _app.onRaise.listen((_) => _window.focus());
-    _app.onAlarm.listen((_) => toStopState());
-    _jsWindow.onResize.listen(this.resizeWindow);
-    _jsWindow.onLoad.listen(this.resizeWindow);
-    absolutizeElements(
-      _jsWindow.document.querySelectorAll("#buttons_container_id button"));
-    _jsWindow
-      .document
-      .querySelector("#timer_text_id")
-      .text = "Stopped";
-    _jsWindow.document.querySelector("#pomodoro_button_id").onClick.listen(clickAction(pomeranian.Button.POMODORO));
-    _jsWindow.document.querySelector("#long_button_id").onClick.listen(clickAction(pomeranian.Button.LONG_BREAK));
-    _jsWindow.document.querySelector("#short_button_id").onClick.listen(clickAction(pomeranian.Button.SHORT_BREAK));
-    _jsWindow.document.querySelector("#stop_button_id").onClick.listen(clickStop);
-    _jsWindow.onKeyPress.listen((KeyboardEvent keyEvent) {
-      if (keyEvent.keyCode != 13) return;
-      keyEvent.preventDefault();
-      keyEvent.stopPropagation();
-      if (_app.stopped) {
-        clickAction(nextButton)(keyEvent);
-      } else {
-        clickStop(keyEvent);
-      }
-    });
-  }
-  
-  presetAlarmState(chrome.Alarm alarm) {
-    _jsWindow.document.querySelector("#stop_button_id").style.display = "inline-block";
-    _jsWindow.document.querySelector("#pomodoro_button_id").style.display=
-        _jsWindow.document.querySelector("#short_button_id").style.display =
-        _jsWindow.document.querySelector("#long_button_id").style.display =
-        "none";
-    _jsWindow.document.querySelector("#title_id").text = alarm.name;
-    timerLoop();
-  }
-  
-  ClickHandlerFunction clickAction(pomeranian.Button button) => ((Event event) {
-    event.preventDefault();
-    var nextAnimation;
-    if (this.currentAnimation.data != null &&
-        this.currentAnimation.data is pomeranian.TransitionButtonsAnimation) {
-      pomeranian.TransitionButtonsAnimation prevAnimation = this.currentAnimation.data; 
-      nextAnimation = 
-         new pomeranian.TransitionButtonsAnimation(
-           _jsWindow,
-           currentAnimation,
-           defaultButtonsContainerWidth: _buttonsContainerWidth,
-           focusButton: button,
-           isGoingToStop: true,
-           startPosition: (time) => 1-prevAnimation.positionAtTime(time));
+    _app.onAlarm.listen((_) => _animateToStopState());
+    _jsWindow.onResize.listen(_resizeWindow);
+    if (viewIsReady) { 
+      _resizeWindow(null);
     } else {
-      nextAnimation = 
-         new pomeranian.TransitionButtonsAnimation(
-           _jsWindow,
-           currentAnimation,
-           defaultButtonsContainerWidth: _buttonsContainerWidth,
-           focusButton: button,
-           isGoingToStop: true);
-    }
-    _lastButton = button;
-    if (button == nextButton) {
-      _lastAction++;
-    } else if (button == pomeranian.Button.POMODORO) {
-      _lastAction = 1;
-    } else if (button == pomeranian.Button.SHORT_BREAK) {
-      _lastAction = 2;
-    } else {
-      _lastAction = 0;
-    }
-    chrome.notifications.clear("_pomerananianNotification");
-    animateNow().then(nextAnimation.drawFirstFrame);
-    setTimer(button);
-  });
-  
-  void setTimer (pomeranian.Button button) {
-    int delayInMinutes;
-    String eventName;
-    if (button == pomeranian.Button.POMODORO) {
-      delayInMinutes = 25;
-      eventName = "Work";
-    } else if (button == pomeranian.Button.SHORT_BREAK) {
-      delayInMinutes = 5;
-      eventName = "Short Break";
-    } else {
-      delayInMinutes = 15;
-      eventName = "Long Break";
-    }
-    _jsWindow.document.querySelector("#title_id").text = eventName;
-    _setWasRunningWhenClosed(true);
-    _app.setAlarm(delayInMinutes, name: eventName);
-    timerLoop();
-  }
-  
-  int previousTime = 0;
-  
-  void timerLoop () {
-    if (_app.stopped) return;
-    var newTime = _app.timeout.difference(new DateTime.now()).inSeconds;
-    if (newTime != previousTime) {
-      previousTime = newTime;
-      timerLoopAnimationFrame.then(redrawClock);
-    }
-    _redrawClockTimer = new Timer(new Duration(milliseconds:100), timerLoop);
-  }
-  
-  void redrawClock (double clock) {
-    int previousMinutes = previousTime ~/ 60;
-    int previousSeconds = previousTime % 60;
-    String secondsText = ((previousSeconds < 10)?'0':'') + previousSeconds.toString();
-    _jsWindow.document.querySelector("#timer_text_id")
-          .text = previousMinutes.toString() + ':' + secondsText;
-  }
-  void highlightNextButton() {
-    String nextHighlight;
-    if (nextButton == pomeranian.Button.POMODORO) {
-        nextHighlight = "#pomodoro_button_id";
-    } else if (nextButton == pomeranian.Button.SHORT_BREAK) {
-        nextHighlight = "#short_button_id";
-    } else {
-      nextHighlight = "#long_button_id";
+      _jsWindow.onLoad.listen(_resizeWindow);
     }
     
-    _jsWindow.document.querySelector(currentlyHighlighted).classes.remove('focused');
-    _jsWindow.document.querySelector(nextHighlight).classes.add('focused');
-    currentlyHighlighted = nextHighlight;
-  }
-  void toStopState() {
-    if (_redrawClockTimer != null) {
-      _redrawClockTimer.cancel();
-      _redrawClockTimer = null;
-    }
-    var nextAnimation;
-    if (this.currentAnimation.data != null &&
-                     this.currentAnimation.data is pomeranian.TransitionButtonsAnimation) {
-            pomeranian.TransitionButtonsAnimation prevAnimation = this.currentAnimation.data;
-            nextAnimation = 
-                new pomeranian.TransitionButtonsAnimation(
-                    _jsWindow,
-                    currentAnimation,
-                    defaultButtonsContainerWidth: _buttonsContainerWidth,
-                    focusButton: _lastButton,
-                    isGoingToStop: false,
-                    startPosition: (time) => 1-prevAnimation.positionAtTime(time));
-    } else {
-            nextAnimation = 
-              new pomeranian.TransitionButtonsAnimation(
-                  _jsWindow,
-                  currentAnimation,
-                  defaultButtonsContainerWidth: _buttonsContainerWidth,
-                  focusButton: _lastButton,
-                  isGoingToStop: false);
-    }
-    _setWasRunningWhenClosed(false);
-    animateNow().then(nextAnimation.drawFirstFrame);
-    highlightNextButton();
-    timerLoopAnimationFrame.then((_) {
-      _jsWindow.document.querySelector("#title_id").text = "Pomeranian";
-      _jsWindow.document.querySelector("#timer_text_id").text = "Stopped";
-    });
-  }
-  
-  void clickStop(Event event) {
-      
-      if (this.currentAnimation.data != null &&
-          this.currentAnimation.data is pomeranian.TransitionButtonsAnimation &&
-          !(this.currentAnimation.data as pomeranian.TransitionButtonsAnimation).isGoingToStop) {
-        clickAction((this.currentAnimation.data as pomeranian.TransitionButtonsAnimation).focusButton)(event); 
-        return;
-      } 
-      
-      event.preventDefault();
-      _lastAction = 0;
-      toStopState();
-      _app.cancelAlarm();
-    }
-  
-  void resizeWindow(Event event) {
-    dynamic bounds = _window.getBounds().jsProxy;
-    //TODO(ads) File bug report as the compilation of this is incorrect.
-    _buttonsContainerWidth = bounds['width'] - 30;
-    if (currentAnimation.data != null) {
-      currentAnimation.data.buttonsContainerWidth = _buttonsContainerWidth;
-    } else {
-      var nextAnimation = new pomeranian.ResizeAnimation(_jsWindow,currentAnimation,_buttonsContainerWidth);
-      animateNow().then(nextAnimation.drawFirstFrame);
-    }
-    var timerText = _jsWindow.document.querySelector("#timer_text_id");
-    //TODO(ads) File bug report as the compilation of this is incorrect.
-    var computedMarginTop    = (bounds['height'] - 160 - timerText.clientHeight) ~/ 2;
-    //TODO(ads) File bug report as the compilation of this is incorrect.
-    var computedMarginBottom = bounds['height'] - 160 - timerText.clientHeight 
-                              - computedMarginTop;
-    _jsWindow.animationFrame.then((_) {
-      timerText.style
-        ..marginTop = computedMarginTop.toString() + 'px'
-        ..marginBottom = computedMarginBottom.toString() + 'px';
-    });
-  }
-  
-  //TODO: This doesn't really belong here.
-  static void absolutizeElements (Iterable<Element> collection) {
     List<Bounds> bounds = new List();
-    for (Element element in collection) {
+    for (Element element in document.querySelectorAll("#buttons_container_id button")) {
       bounds.add(new Bounds(
         left: element.offsetLeft,
         width: element.offsetWidth,
@@ -317,7 +137,7 @@ class View {
         height: element.offsetHeight
       ));
     }
-    var collectionIterator = collection.iterator;
+    var collectionIterator = document.querySelectorAll("#buttons_container_id button").iterator;
     var boundsIterator = bounds.iterator; 
     while (collectionIterator.moveNext()) {
       boundsIterator.moveNext();
@@ -334,20 +154,202 @@ class View {
       collectionIterator.current.style.top = 
           boundsIterator.current.top.toString() + "px";
     }
+    
+    document.querySelector("#pomodoro_button_id").onClick.listen(_clickActionButton(pomeranian.Button.POMODORO));
+    document.querySelector("#long_button_id").onClick.listen(_clickActionButton(pomeranian.Button.LONG_BREAK));
+    document.querySelector("#short_button_id").onClick.listen(_clickActionButton(pomeranian.Button.SHORT_BREAK));
+    document.querySelector("#stop_button_id").onClick.listen(_clickStop);
+    _jsWindow.onKeyPress.listen((KeyboardEvent keyEvent) {
+      if (keyEvent.keyCode != 13) return;
+      keyEvent.preventDefault();
+      keyEvent.stopPropagation();
+      if (_app.stopped) {
+        _clickActionButton(_nextButton)(keyEvent);
+      } else {
+        _clickStop(keyEvent);
+      }
+    });
   }
   
-  //TODO: I thought this would make things clearer in general,
-  //but I think it just confuses things.
-  Future<num> animateNow() {
-    if (currentAnimation.data == null) {
-      return _jsWindow.animationFrame;
+  _presetAlarmState() {
+    document.querySelector("#stop_button_id").style.display = "inline-block";
+    document.querySelector("#pomodoro_button_id").style.display=
+    document.querySelector("#short_button_id").style.display =
+    document.querySelector("#long_button_id").style.display =
+        "none";
+    document.querySelector("#title_id").text = _app.alarmName;
+    _timerLoop();
+  }
+  
+  ClickHandlerFunction _clickActionButton(pomeranian.Button button) => ((Event event) {
+    event.preventDefault();
+    var nextAnimation;
+    if (this._currentAnimation.data != null &&
+        this._currentAnimation.data is pomeranian.TransitionButtonsAnimation) {
+      pomeranian.TransitionButtonsAnimation prevAnimation = this._currentAnimation.data; 
+      nextAnimation = 
+         new pomeranian.TransitionButtonsAnimation(
+           this,
+           _currentAnimation,
+           defaultButtonsContainerWidth: _buttonsContainerWidth,
+           focusButton: button,
+           isGoingToStop: true,
+           startPosition: (time) => 1-prevAnimation.positionAtTime(time));
     } else {
-      return currentAnimation.data.stop().then((innerTime) =>
-        _jsWindow.animationFrame);
+      nextAnimation = 
+         new pomeranian.TransitionButtonsAnimation(
+           this,
+           _currentAnimation,
+           defaultButtonsContainerWidth: _buttonsContainerWidth,
+           focusButton: button,
+           isGoingToStop: true);
     }
+    requestFirstAnimationFrame().then((firstFrame) {
+      _currentAnimation.data = nextAnimation;
+      firstFrame.onDraw.listen(nextAnimation.drawFirstFrame);
+    });
+    _lastButton = button;
+    if (button == _nextButton) {
+      _app.lastAction++;
+    } else if (button == pomeranian.Button.POMODORO) {
+      _app.lastAction = 1;
+    } else if (button == pomeranian.Button.SHORT_BREAK) {
+      _app.lastAction = 2;
+    } else {
+      _app.lastAction = 0;
+    }
+    chrome.notifications.clear("_pomerananianNotification");
+    _setTimerFromButton (button, event);
+  });
+  
+  void _setTimerFromButton (pomeranian.Button button, Event event) {
+    int delayInMinutes;
+    String eventName;
+    if (button == pomeranian.Button.POMODORO) {
+      delayInMinutes = 25;
+      eventName = "Work";
+    } else if (button == pomeranian.Button.SHORT_BREAK) {
+      delayInMinutes = 5;
+      eventName = "Short Break";
+    } else {
+      delayInMinutes = 15;
+      eventName = "Long Break";
+    }
+    document.querySelector("#title_id").text = eventName;
+    _app.setAlarm(delayInMinutes, event, name: eventName);
+    _timerLoop();
+  }
+  
+  
+  void _timerLoop () {
+    if (_app.stopped) return;
+    var newTime = _app.alarmTimeout.difference(new DateTime.now()).inSeconds;
+    if (newTime != _previousTime) {
+      _previousTime = newTime;
+      _timerLoopAnimationFrame.onDraw.listen(_redrawClock);
+    }
+    _redrawClockTimer = new Timer(new Duration(milliseconds:100), _timerLoop);
+  }
+  
+  void _redrawClock (double clock) {
+    int previousMinutes = _previousTime ~/ 60;
+    int previousSeconds = _previousTime % 60;
+    String secondsText = ((previousSeconds < 10)?'0':'') + previousSeconds.toString();
+    document.querySelector("#timer_text_id")
+          .text = previousMinutes.toString() + ':' + secondsText;
+  }
+  void _highlightNextButton() {
+    String nextHighlight;
+    if (_nextButton == pomeranian.Button.POMODORO) {
+        nextHighlight = "#pomodoro_button_id";
+    } else if (_nextButton == pomeranian.Button.SHORT_BREAK) {
+        nextHighlight = "#short_button_id";
+    } else {
+      nextHighlight = "#long_button_id";
+    }
+    
+    document.querySelector(_currentlyHighlightedButton).classes.remove('focused');
+    document.querySelector(nextHighlight).classes.add('focused');
+    _currentlyHighlightedButton = nextHighlight;
+  }
+  void _animateToStopState() {
+    if (_redrawClockTimer != null) {
+      _redrawClockTimer.cancel();
+      _redrawClockTimer = null;
+    }
+    var nextAnimation;
+    if (this._currentAnimation.data != null &&
+                     this._currentAnimation.data is pomeranian.TransitionButtonsAnimation) {
+            pomeranian.TransitionButtonsAnimation prevAnimation = this._currentAnimation.data;
+            nextAnimation = 
+                new pomeranian.TransitionButtonsAnimation(
+                    this,
+                    _currentAnimation,
+                    defaultButtonsContainerWidth: _buttonsContainerWidth,
+                    focusButton: _lastButton,
+                    isGoingToStop: false,
+                    startPosition: (time) => 1-prevAnimation.positionAtTime(time));
+    } else {
+            nextAnimation = 
+              new pomeranian.TransitionButtonsAnimation(
+                  this,
+                  _currentAnimation,
+                  defaultButtonsContainerWidth: _buttonsContainerWidth,
+                  focusButton: _lastButton,
+                  isGoingToStop: false);
+    }
+    requestFirstAnimationFrame().then((firstFrame) {
+      _currentAnimation.data = nextAnimation;
+      firstFrame.onDraw.listen(nextAnimation.drawFirstFrame);
+    });
+    _highlightNextButton();
+    _timerLoopAnimationFrame.onDraw.listen((_) {
+      document.querySelector("#title_id").text = "Pomeranian";
+      document.querySelector("#timer_text_id").text = "Stopped";
+    });
+  }
+  
+  void _clickStop(Event event) {
+      
+      if (this._currentAnimation.data != null &&
+          this._currentAnimation.data is pomeranian.TransitionButtonsAnimation &&
+          !(this._currentAnimation.data as pomeranian.TransitionButtonsAnimation).isGoingToStop) {
+        _clickActionButton((this._currentAnimation.data as pomeranian.TransitionButtonsAnimation).focusButton)(event); 
+        return;
+      } 
+      
+      event.preventDefault();
+      _app.lastAction = 0;
+      _animateToStopState();
+      _app.cancelAlarm();
+    }
+  
+  void _resizeWindow(Event event) {
+    dynamic bounds = _window.getBounds().jsProxy;
+    //TODO(ads) File bug report as the compilation of this is incorrect.
+    _buttonsContainerWidth = bounds['width'] - 30;
+    if (_currentAnimation.data != null) {
+      _currentAnimation.data.buttonsContainerWidth = _buttonsContainerWidth;
+    } else {
+      var nextAnimation = new pomeranian.ResizeAnimation(this,_currentAnimation,_buttonsContainerWidth);
+      requestFirstAnimationFrame().then((firstFrame) {
+        _currentAnimation.data = nextAnimation;
+      firstFrame.onDraw.listen(nextAnimation.drawFirstFrame);
+    });
+    }
+    var timerText = document.querySelector("#timer_text_id");
+    //TODO(ads) File bug report as the compilation of this is incorrect.
+    var computedMarginTop    = (bounds['height'] - 160 - timerText.clientHeight) ~/ 2;
+    //TODO(ads) File bug report as the compilation of this is incorrect.
+    var computedMarginBottom = bounds['height'] - 160 - timerText.clientHeight 
+                              - computedMarginTop;
+    _jsWindow.animationFrame.then((_) {
+      timerText.style
+        ..marginTop = computedMarginTop.toString() + 'px'
+        ..marginBottom = computedMarginBottom.toString() + 'px';
+    });
   }
 }
-
 
 class Bounds {
   final int left;

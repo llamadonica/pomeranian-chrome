@@ -26,19 +26,28 @@ import 'dart:html';
 import 'dart:async';
 import 'easing_curve.dart';
 import 'animation.dart';
+import 'generic_view.dart' as generic;
 
 abstract class ViewAnimation extends Animation {
+  Pointer<ViewAnimation> pointer;
   int get commonButtonWidth => (buttonsContainerWidth - 20 + 1) ~/ 3;
   int get middleButtonAdjust => ((buttonsContainerWidth - 20 + 1) % 3) - 1; 
   int get buttonsContainerWidth;
   set buttonsContainerWidth (int value);
   void drawFirstFrame (double time);
+  @override Future<double> stop() {
+    return super.stop().then((time) {
+      pointer.data = null;
+      return time;
+    });
+  }
 }
 
+//TODO: Clean up private properties and methods.
 class ResizeAnimation extends ViewAnimation {
-  final Window _jsWindow;
-  Window get window => _jsWindow;
-  final Pointer<ViewAnimation> _pointer;
+  final generic.AnimatableView _view;
+  generic.AnimatableView get view => _view;
+  final Pointer<ViewAnimation> pointer;
   int _buttonsContainerWidth;
   final Element pomodoroButton;
   final Element longButton;
@@ -48,15 +57,14 @@ class ResizeAnimation extends ViewAnimation {
   set buttonsContainerWidth (int value) {
     _buttonsContainerWidth = value;
   }
-  ResizeAnimation(Window window, Pointer<ViewAnimation> this._pointer, int this._buttonsContainerWidth) :
-    _jsWindow = window,
+  ResizeAnimation(generic.AnimatableView window, Pointer<ViewAnimation> this.pointer, int this._buttonsContainerWidth) :
+    _view = window,
     pomodoroButton = window.document.querySelector("#pomodoro_button_id"),
     longButton = window.document.querySelector("#long_button_id"),
     shortButton = window.document.querySelector("#short_button_id"),
-    stopButton = window.document.querySelector("#stop_button_id");
+    stopButton = window.document.querySelector("#stop_button_id"); 
   @override void drawFirstFrame (double time) {
-    _pointer.data = this;
-    _jsWindow.document.querySelector("#buttons_container_id").style.width =
+    _view.document.querySelector("#buttons_container_id").style.width =
         buttonsContainerWidth.toString() + "px";
 
     int shortBreakButtonLeft = commonButtonWidth + 10;
@@ -78,7 +86,7 @@ class ResizeAnimation extends ViewAnimation {
     redraw(time);
   }
   @override animateFrame(double time) {
-    _pointer.data = null;
+    pointer.data = null;
     return false;
   }
   @override stop() {
@@ -86,13 +94,14 @@ class ResizeAnimation extends ViewAnimation {
   }
 }
 
+//TODO: Clean up private properties and methods.
 class TransitionButtonsAnimation extends ViewAnimation {
-    final Window _jsWindow;
+    final generic.AnimatableView _view;
     final Element pomodoroButton;
     final Element longButton;
     final Element shortButton;
     final Element stopButton;
-    final Pointer<ViewAnimation> _pointer;
+    final Pointer<ViewAnimation> pointer;
     final Button focusButton;
     final bool isGoingToStop;
     final num animationDuration;
@@ -104,25 +113,24 @@ class TransitionButtonsAnimation extends ViewAnimation {
       defaultButtonsContainerWidth = value;
     }
     
-    Window get window => _jsWindow;
+    generic.AnimatableView get view => _view;
     TransitionButtonsAnimation(
-        Window window,
-        Pointer<TransitionButtonsAnimation> pointer,
+        generic.AnimatableView window,
+        Pointer<TransitionButtonsAnimation> this.pointer,
         { int this.defaultButtonsContainerWidth: 530,
           Button focusButton,
           bool this.isGoingToStop: false,
           num this.animationDuration: _DEFAULT_ANIMATION_DURATION,
           EasingCurve easingCurve,
           double startPosition(double)}) :
-      _jsWindow = window,
+            _view = window,
       pomodoroButton = window.document.querySelector("#pomodoro_button_id"),
       longButton = window.document.querySelector("#long_button_id"),
       shortButton = window.document.querySelector("#short_button_id"),
       stopButton = window.document.querySelector("#stop_button_id"),
-      _pointer = pointer,
       focusButton = (focusButton == null)?Button.POMODORO:focusButton,
       _easingCurve = (easingCurve == null)?_DEFAULT_EASING_CURVE:easingCurve,
-      _startPosition = (startPosition == null)?((_) => 0):startPosition;
+      _startPosition = (startPosition == null)?((_) => 0):startPosition ;
 
     double _animationStart;
     double _animationEnd;
@@ -192,7 +200,7 @@ class TransitionButtonsAnimation extends ViewAnimation {
           stopButtonWidth = longBreakButtonWidth;
         }
         
-        _jsWindow.document.querySelector("#buttons_container_id").style.width =
+        _view.document.querySelector("#buttons_container_id").style.width =
             buttonsContainerWidth.toString() + "px";
         pomodoroButton.style.width =
             pomodoroButtonWidth.toString() + "px";
@@ -219,7 +227,7 @@ class TransitionButtonsAnimation extends ViewAnimation {
 //          _computedMarginBottom.toString() + "px";
         
         if (finished) {
-          _pointer.data = null;
+          pointer.data = null;
           if (!isGoingToStop) {
             stopButton.style.display = "none";
           } else {
@@ -234,7 +242,6 @@ class TransitionButtonsAnimation extends ViewAnimation {
       var startPosition = _startPosition(time);
       _animationStart = time - animationDuration*startPosition;
       _animationEnd = _animationStart + animationDuration;
-      _pointer.data = this;
       if (isCompleted) 
         throw new StateError ("Each animation may only be run once.");
       if (isGoingToStop) {

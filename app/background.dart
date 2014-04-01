@@ -47,35 +47,42 @@ void onNotificationClicked (String notification) {
 }
 
 void onLaunch ([chrome.LaunchData launchData = null]) {
-    //TODO: Use chrome APIs to discover OS.
-    bool isWindows = ((new RegExp(r'Windows')).hasMatch(window.navigator.userAgent));
-    String frame = isWindows?'chrome':'chrome';
-    chrome.WindowType type = isWindows?chrome.WindowType.SHELL:chrome.WindowType.PANEL;
-    
-    chrome.alarms.getAll().then((alarms) {
-      chrome.Alarm notificationAlarm = null;
-      if (!alarms.isEmpty)
-        notificationAlarm = alarms[0];
-      chrome.app.window.create(
-        'pomeranianchrome.html',
-        new chrome.CreateWindowOptions(
-            id:'_mainWindow',
-            frame:frame,
-            type:type,
-            defaultWidth:560,
-            defaultHeight:240,
-            minWidth: 400,
-            minHeight: 220,
-            alwaysOnTop: true
-            )).then((appWindow) {
-              windowIsActive = true;
-              //TODO: This needs to be more thoroughly validated, since I'm not
-              //sure whether it's possible to miss an alarm here.
-              appWindow.jsProxy['alarm'] = notificationAlarm;
-              appWindow.onClosed.listen((_) {
-                windowIsActive = false;
+    //DONE: Use chrome APIs to discover OS.
+    chrome.runtime.getPlatformInfo().then((platformInfo) {
+      String frame = 'chrome';
+      chrome.WindowType type;
+      switch (platformInfo['os']) {
+        case 'win':
+          type = chrome.WindowType.SHELL;
+          break;
+        default:
+          type = chrome.WindowType.PANEL;
+      }
+      chrome.alarms.getAll().then((alarms) {
+        chrome.Alarm notificationAlarm = null;
+        if (!alarms.isEmpty)
+          notificationAlarm = alarms[0];
+        chrome.app.window.create(
+          'pomeranianchrome.html',
+          new chrome.CreateWindowOptions(
+              id:'_mainWindow',
+              frame:frame,
+              type:type,
+              defaultWidth:560,
+              defaultHeight:240,
+              minWidth: 400,
+              minHeight: 220,
+              alwaysOnTop: true
+              )).then((appWindow) {
+                windowIsActive = true;
+                //TODO: This needs to be more thoroughly validated, since I'm not
+                //sure whether it's possible to miss an alarm here.
+                appWindow.jsProxy['alarm'] = notificationAlarm;
+                appWindow.onClosed.listen((_) {
+                  windowIsActive = false;
               });
             });
+      });
     });
   }
 

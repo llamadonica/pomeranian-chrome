@@ -22,11 +22,13 @@
 
 library pomeranian_controller;
 
+import 'dart:html'
+  show Event;
 import 'dart:async'
-  show StreamController, Stream;
+  show StreamController, Stream, Future;
 import 'package:chrome/chrome_app.dart' as chrome
   show notifications, alarms, NotificationOptions, TemplateType, 
-  AlarmCreateInfo, Alarm;
+  AlarmCreateInfo, Alarm, storage;
 import 'pomeranian_notification_options.dart';
 
 class Controller {
@@ -34,18 +36,20 @@ class Controller {
   Stream<String> get onRaise => _onRaise.stream;
   StreamController _onAlarm = new StreamController();
   Stream get onAlarm => _onAlarm.stream;
-  DateTime timeout = null;
-  bool get stopped => timeout == null;
+  DateTime alarmTimeout = null;
+  String alarmName = null;
+  bool get stopped => alarmTimeout == null;
   Controller([chrome.Alarm alarm = null]) {
     if (alarm != null) {
-      timeout = new DateTime.fromMillisecondsSinceEpoch(alarm.scheduledTime.round());
+      alarmTimeout = new DateTime.fromMillisecondsSinceEpoch(alarm.scheduledTime.round());
+      alarmName = alarm.name;
     }
     chrome.alarms.onAlarm.listen(
       (alarm) {
         chrome.notifications.create(
             "_pomerananianNotification",
             PomeranianNotificationOptions.notificationOptions(alarm.name));
-        timeout = null;
+        alarmTimeout = null;
         _onAlarm.add(null);
     });
     chrome.notifications.onClicked.listen((notification) {
@@ -54,14 +58,34 @@ class Controller {
       chrome.notifications.clear(notification);
     });
   }
-  void setAlarm (int delayInMinutes, {String name:"Pomodoro"}) {
+  void setAlarm (int delayInMinutes, Event event, {String name:"Pomodoro"}) {
     chrome.alarms.clearAll();
     chrome.alarms.create(
         new chrome.AlarmCreateInfo(delayInMinutes:delayInMinutes), name);
-    timeout = (new DateTime.now()).add(new Duration(minutes:delayInMinutes));
+    alarmTimeout = (new DateTime.fromMillisecondsSinceEpoch(event.timeStamp)).add(new Duration(minutes:delayInMinutes));
+    alarmName = name;
+    _setWasRunningWhenClosedInStorage(true);
   }
   void cancelAlarm () {
     chrome.alarms.clearAll();
-    timeout = null;
+    alarmTimeout = null;
+    alarmName = null;
+    _setWasRunningWhenClosedInStorage(false);
   }
+  int _lastAction = 0;
+  int get lastAction => _lastAction;
+  set lastAction (int value) {
+    _lastAction = value;
+    _setLastActionInStorage(value);
+  }
+  Future _setLastActionInStorage(int value) =>
+        chrome.storage.local.set({'lastAction':value});
+  Future _setWasRunningWhenClosedInStorage(bool value) =>
+          chrome.storage.local.set({'wasRunningWhenClosed':value});
+  Future<bool> syncLocalStorage() => 
+        chrome.storage.local.get({'lastAction':0,'wasRunningWhenClosed':false})
+            .then((map) {
+              _lastAction = map['lastAction'];
+              return map['wasRunningWhenClosed'];
+            });
 }

@@ -25,16 +25,19 @@ library animation;
 
 import 'dart:async';
 import 'dart:html';
+import 'generic_view.dart' as generic;
 
 abstract class Animation implements Future<Pair<bool, double>> {    
     Completer<Pair<bool, double>> _completer = new Completer();
     bool get isCompleted => _completer.isCompleted;
-    int _requestedFrame;
+    
+    generic.AnimationFrame nextFrame;
+    
     int frameCount = 0;
     /**
      * The window that owns this animation.
      */
-    Window get window;
+    generic.AnimatableView get view;
     /**
      * Animates the current frame, based on the current time. If the result is
      * true, then it enqueues the frame again. If it's false, it calls the
@@ -47,13 +50,12 @@ abstract class Animation implements Future<Pair<bool, double>> {
      * passed the AnimationStoppedException, instead of calling the done signal.
      */
     Future<double> stop() {
-      window.cancelAnimationFrame(_requestedFrame);
-      
       var stopCompleter = new Completer();
-      var now = window.performance.now();
+      var now = view.now();
       _completer.future.whenComplete(() {
         stopCompleter.complete(now);
       });
+      nextFrame.cancel();
       _completer.complete(new Pair(false, now));
       return stopCompleter.future;
     }
@@ -71,9 +73,12 @@ abstract class Animation implements Future<Pair<bool, double>> {
         continueAnimation = false;
       }
       if (continueAnimation) {
-        _requestedFrame = window.requestAnimationFrame(redraw);
+        nextFrame = view.requestAnimationFrame();
+        nextFrame.onDraw.listen(redraw);
         return;
-      } else if (throwError == null) {
+      } else if (this._completer.isCompleted) 
+        throw new StateError ("Each animation may only be run once.");
+      else if (throwError == null) {
         _completer.complete(new Pair(true, time));
         return;
       } else {
@@ -92,7 +97,8 @@ abstract class Animation implements Future<Pair<bool, double>> {
     Animation start() {
       if (this._completer.isCompleted) 
         throw new StateError ("Each animation may only be run once.");
-      _requestedFrame = window.requestAnimationFrame(redraw);
+      nextFrame = view.requestAnimationFrame();
+      nextFrame.onDraw.listen(redraw);
       return this;
     }
 }

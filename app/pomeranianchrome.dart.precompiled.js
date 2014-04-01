@@ -314,7 +314,7 @@ var $$ = {};
     }, "call$0", "get$toString", 0, 0, null],
     noSuchMethod$1: [function(receiver, invocation) {
       throw H.wrapException(P.NoSuchMethodError$(receiver, invocation.get$memberName(), invocation.get$positionalArguments(), invocation.get$namedArguments(), null));
-    }, "call$1", "get$noSuchMethod", 2, 0, null, 146, []],
+    }, "call$1", "get$noSuchMethod", 2, 0, null, 145, []],
     "%": "ArrayBuffer|MediaError|MediaKeyError|Navigator|PositionError|SQLError|SVGAnimatedLength|SVGAnimatedNumberList"
   },
   JSBool: {
@@ -362,7 +362,7 @@ var $$ = {};
       var t1;
       for (t1 = J.get$iterator$ax(collection); t1.moveNext$0();)
         this.add$1(receiver, t1.get$current());
-    }, "call$1", "get$addAll", 2, 0, null, 141, []],
+    }, "call$1", "get$addAll", 2, 0, null, 146, []],
     forEach$1: [function(receiver, f) {
       return H.IterableMixinWorkaround_forEach(receiver, f);
     }, "call$1", "get$forEach", 2, 0, null, 87, []],
@@ -409,7 +409,7 @@ var $$ = {};
     },
     $index: [function(receiver, index) {
       if (typeof index !== "number" || Math.floor(index) !== index)
-        throw H.wrapException(P.ArgumentError$(index));
+        throw H.wrapException(new P.ArgumentError(index));
       if (index >= receiver.length || index < 0)
         throw H.wrapException(P.RangeError$value(index));
       return receiver[index];
@@ -432,7 +432,7 @@ var $$ = {};
     static: {JSArray_JSArray$fixed: function($length, $E) {
         var t1;
         if (typeof $length !== "number" || Math.floor($length) !== $length || $length < 0)
-          throw H.wrapException(P.ArgumentError$("Length must be a non-negative integer: " + H.S($length)));
+          throw H.wrapException(new P.ArgumentError("Length must be a non-negative integer: " + H.S($length)));
         t1 = H.setRuntimeTypeInfo(new Array($length), [$E]);
         t1.fixed$length = init;
         return t1;
@@ -494,7 +494,7 @@ var $$ = {};
     }, "call$1", "get$+", 2, 0, null, 71, []],
     $sub: [function(receiver, other) {
       if (typeof other !== "number")
-        throw H.wrapException(P.ArgumentError$(other));
+        throw H.wrapException(new P.ArgumentError(other));
       return receiver - other;
     }, "call$1", "get$-", 2, 0, null, 71, []],
     $div: [function(receiver, other) {
@@ -571,7 +571,7 @@ var $$ = {};
     }, "call$1", "get$>", 2, 0, null, 71, []],
     $ge: [function(receiver, other) {
       if (typeof other !== "number")
-        throw H.wrapException(P.ArgumentError$(other));
+        throw H.wrapException(new P.ArgumentError(other));
       return receiver >= other;
     }, "call$1", "get$>=", 2, 0, null, 71, []],
     $isnum: true,
@@ -680,7 +680,7 @@ var $$ = {};
     },
     $index: [function(receiver, index) {
       if (typeof index !== "number" || Math.floor(index) !== index)
-        throw H.wrapException(P.ArgumentError$(index));
+        throw H.wrapException(new P.ArgumentError(index));
       if (index >= receiver.length || index < 0)
         throw H.wrapException(P.RangeError$value(index));
       return receiver[index];
@@ -1171,7 +1171,7 @@ var $$ = {};
       return typeof other === "object" && other !== null && !!t1.$is_NativeJsSendPort && J.$eq(this._receivePort, other._receivePort);
     }, "call$1", "get$==", 2, 0, null, 71, []],
     get$hashCode: function(_) {
-      return this._receivePort.get$_id();
+      return this._receivePort.get$__isolate_helper$_id();
     },
     $is_NativeJsSendPort: true,
     $isSendPort: true
@@ -1225,7 +1225,7 @@ var $$ = {};
     $isSendPort: true
   },
   RawReceivePortImpl: {
-    "^": "Object;_id<,_handler,_isClosed<",
+    "^": "Object;__isolate_helper$_id<,_handler,_isClosed<",
     _handler$1: function(arg0) {
       return this._handler.call$1(arg0);
     },
@@ -1240,14 +1240,14 @@ var $$ = {};
     "^": "_Serializer;_nextFreeRefId,_visited",
     visitSendPort$1: [function(x) {
       if (!!x.$is_NativeJsSendPort)
-        return ["sendport", init.globalState.currentManagerId, x._isolateId, x._receivePort.get$_id()];
+        return ["sendport", init.globalState.currentManagerId, x._isolateId, x._receivePort.get$__isolate_helper$_id()];
       if (!!x.$is_WorkerSendPort)
         return ["sendport", x._workerId, x._isolateId, x._receivePortId];
       throw H.wrapException("Illegal underlying port " + H.S(x));
     }, "call$1", "get$visitSendPort", 2, 0, null, 13, []],
     visitCapability$1: [function(x) {
       if (!!x.$isCapabilityImpl)
-        return ["capability", x._id];
+        return ["capability", x.__isolate_helper$_id];
       throw H.wrapException("Capability not serializable: " + H.S(x));
     }, "call$1", "get$visitCapability", 2, 0, null, 13, []]
   },
@@ -1262,7 +1262,7 @@ var $$ = {};
     }, "call$1", "get$visitSendPort", 2, 0, null, 13, []],
     visitCapability$1: [function(x) {
       if (!!x.$isCapabilityImpl)
-        return new H.CapabilityImpl(x._id);
+        return new H.CapabilityImpl(x.__isolate_helper$_id);
       throw H.wrapException("Capability not serializable: " + H.S(x));
     }, "call$1", "get$visitCapability", 2, 0, null, 13, []]
   },
@@ -1595,10 +1595,10 @@ var $$ = {};
     $isFunction: true
   },
   CapabilityImpl: {
-    "^": "Object;_id<",
+    "^": "Object;__isolate_helper$_id<",
     get$hashCode: function(_) {
       var hash, t1, t2;
-      hash = this._id;
+      hash = this.__isolate_helper$_id;
       t1 = J.getInterceptor$n(hash);
       t2 = t1.$shr(hash, 0);
       t1 = t1.$tdiv(hash, 4294967296);
@@ -1618,8 +1618,8 @@ var $$ = {};
         return true;
       t1 = J.getInterceptor(other);
       if (typeof other === "object" && other !== null && !!t1.$isCapabilityImpl) {
-        t1 = this._id;
-        t2 = other._id;
+        t1 = this.__isolate_helper$_id;
+        t2 = other.__isolate_helper$_id;
         return t1 == null ? t2 == null : t1 === t2;
       }
       return false;
@@ -1705,14 +1705,14 @@ var $$ = {};
     for (t1 = new H.ListIterator(codePoints, codePoints.length, 0, null); t1.moveNext$0();) {
       i = t1._current;
       if (typeof i !== "number" || Math.floor(i) !== i)
-        throw H.wrapException(P.ArgumentError$(i));
+        throw H.wrapException(new P.ArgumentError(i));
       if (i <= 65535)
         a.push(i);
       else if (i <= 1114111) {
         a.push(55296 + (C.JSInt_methods._shrOtherPositive$1(i - 65536, 10) & 1023));
         a.push(56320 + (i & 1023));
       } else
-        throw H.wrapException(P.ArgumentError$(i));
+        throw H.wrapException(new P.ArgumentError(i));
     }
     return H.Primitives__fromCharCodeApply(a);
   }, "call$1", "Primitives_stringFromCodePoints$closure", 2, 0, null, 17, []],
@@ -1721,9 +1721,9 @@ var $$ = {};
     for (t1 = new H.ListIterator(charCodes, charCodes.length, 0, null); t1.moveNext$0();) {
       i = t1._current;
       if (typeof i !== "number" || Math.floor(i) !== i)
-        throw H.wrapException(P.ArgumentError$(i));
+        throw H.wrapException(new P.ArgumentError(i));
       if (i < 0)
-        throw H.wrapException(P.ArgumentError$(i));
+        throw H.wrapException(new P.ArgumentError(i));
       if (i > 65535)
         return H.Primitives_stringFromCodePoints(charCodes);
     }
@@ -2756,7 +2756,7 @@ var $$ = {};
     "^": "Closure;"
   },
   BoundClosure: {
-    "^": "TearOffClosure;_self,_target,_receiver,__js_helper$_name",
+    "^": "TearOffClosure;_self,__js_helper$_target,_receiver,__js_helper$_name",
     $eq: [function(_, other) {
       var t1;
       if (other == null)
@@ -2766,7 +2766,7 @@ var $$ = {};
       t1 = J.getInterceptor(other);
       if (typeof other !== "object" || other === null || !t1.$isBoundClosure)
         return false;
-      return this._self === other._self && this._target === other._target && this._receiver === other._receiver;
+      return this._self === other._self && this.__js_helper$_target === other.__js_helper$_target && this._receiver === other._receiver;
     }, "call$1", "get$==", 2, 0, null, 71, []],
     get$hashCode: function(_) {
       var t1, receiverHashCode;
@@ -2775,7 +2775,7 @@ var $$ = {};
         receiverHashCode = H.Primitives_objectHashCode(this._self);
       else
         receiverHashCode = typeof t1 !== "object" ? J.get$hashCode$(t1) : H.Primitives_objectHashCode(t1);
-      return J.$xor$n(receiverHashCode, H.Primitives_objectHashCode(this._target));
+      return J.$xor$n(receiverHashCode, H.Primitives_objectHashCode(this.__js_helper$_target));
     },
     $isBoundClosure: true,
     static: {"^": "BoundClosure_selfFieldNameCache,BoundClosure_receiverFieldNameCache", BoundClosure_selfOf: [function(closure) {
@@ -2954,22 +2954,19 @@ var $$ = {};
   Animation: {
     "^": "Object;",
     stop$0: [function(_) {
-      var t1, t2, stopCompleter, now;
-      t1 = this.get$window(this);
-      t2 = this._requestedFrame;
-      C.Window_methods._ensureRequestAnimationFrame$0(t1);
-      t1.cancelAnimationFrame(t2);
+      var stopCompleter, now, t1;
       stopCompleter = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      now = this.get$window(this).performance.now();
-      t2 = this._animation$_completer.future;
-      t2.whenComplete$1(new L.Animation_stop_closure(stopCompleter, now));
-      if (t2._state !== 0)
+      now = this.get$view(this)._jsWindow.performance.now();
+      t1 = this._animation$_completer.future;
+      t1.whenComplete$1(new L.Animation_stop_closure(stopCompleter, now));
+      this.nextFrame.cancel$0();
+      if (t1._state !== 0)
         H.throwExpression(new P.StateError("Future already completed"));
-      t2._asyncComplete$1(new L.Pair(false, now));
+      t1._asyncComplete$1(new L.Pair(false, now));
       return stopCompleter.future;
     }, "call$0", "get$stop", 0, 0, null],
     redraw$1: [function(time) {
-      var continueAnimation, throwError, e, exception, t1, t2;
+      var continueAnimation, throwError, e, exception, t1, t2, t3, t4;
       continueAnimation = false;
       throwError = null;
       try {
@@ -2982,18 +2979,25 @@ var $$ = {};
       }
 
       if (continueAnimation === true) {
-        t1 = this.get$window(this);
-        t2 = this.get$redraw();
+        t1 = this.get$view(this)._jsWindow;
+        t2 = P.StreamController_StreamController(null, null, null, null, true, null);
+        t3 = new T.WindowAnimationFrame(t1, t2, P.StreamController_StreamController(null, null, null, null, true, null), null, false);
+        t4 = t3.get$callback();
         C.Window_methods._ensureRequestAnimationFrame$0(t1);
-        this._requestedFrame = C.Window_methods._requestAnimationFrame$1(t1, W._wrapZone(t2));
+        t3._id = C.Window_methods._requestAnimationFrame$1(t1, W._wrapZone(t4));
+        this.nextFrame = t3;
+        H.setRuntimeTypeInfo(new P._ControllerStream(t2), [null]).listen$1(this.get$redraw());
         return;
       } else {
         t1 = this._animation$_completer;
-        if (throwError == null) {
-          t1 = t1.future;
-          if (t1._state !== 0)
+        t2 = t1.future;
+        t3 = t2._state !== 0;
+        if (t3)
+          throw H.wrapException(new P.StateError("Each animation may only be run once."));
+        else if (throwError == null) {
+          if (t3)
             H.throwExpression(new P.StateError("Future already completed"));
-          t1._asyncComplete$1(new L.Pair(true, time));
+          t2._asyncComplete$1(new L.Pair(true, time));
           return;
         } else {
           t1.completeError$1(throwError);
@@ -3034,7 +3038,7 @@ var $$ = {};
     return jsProxy == null ? null : new L.Alarm(jsProxy);
   }, "call$1", "_createAlarm$closure", 2, 0, 72, 73, []],
   ChromeAlarms: {
-    "^": "ChromeApi;_onAlarm",
+    "^": "ChromeApi;_alarms0$_onAlarm",
     clearAll$0: [function() {
       var t1 = $.get$chrome();
       if (J.$index$asx(t1, "alarms") == null)
@@ -3045,7 +3049,7 @@ var $$ = {};
       throw H.wrapException(P.UnsupportedError$("'chrome.alarms' is not available"));
     }, "call$0", "get$_alarms0$_throwNotAvailable", 0, 0, null],
     ChromeAlarms$_$0: function() {
-      this._onAlarm = F.ChromeStreamController$oneArg(new L.ChromeAlarms$__closure(this), "onAlarm", L._createAlarm$closure(), null, L.Alarm);
+      this._alarms0$_onAlarm = F.ChromeStreamController$oneArg(new L.ChromeAlarms$__closure(this), "onAlarm", L._createAlarm$closure(), null, L.Alarm);
     },
     static: {ChromeAlarms$_: function() {
         var t1 = new L.ChromeAlarms(null);
@@ -3112,17 +3116,17 @@ var $$ = {};
     current$0: [function() {
       var t1 = $.get$chrome();
       if (J.$index$asx(J.$index$asx(t1, "app"), "window") == null)
-        this._app0$_throwNotAvailable$0();
+        this._throwNotAvailable$0();
       t1 = J.$index$asx(J.$index$asx(t1, "app"), "window").callMethod$1("current");
       return t1 == null ? null : new B.AppWindow(H.fillLiteralMap([], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)), null, t1);
     }, "call$0", "get$current", 0, 0, null],
-    _app0$_throwNotAvailable$0: [function() {
+    _throwNotAvailable$0: [function() {
       throw H.wrapException(P.UnsupportedError$("'chrome.app.window' is not available"));
-    }, "call$0", "get$_app0$_throwNotAvailable", 0, 0, null],
+    }, "call$0", "get$_throwNotAvailable", 0, 0, null],
     _app0$_ChromeAppWindow$_$0: function() {
       var getApi = new B._ChromeAppWindow$__closure(this);
       this._onBoundsChanged = F.ChromeStreamController$noArgs(getApi, "onBoundsChanged", null);
-      this._app0$_onClosed = F.ChromeStreamController$noArgs(getApi, "onClosed", null);
+      this._onClosed = F.ChromeStreamController$noArgs(getApi, "onClosed", null);
       this._onFullscreened = F.ChromeStreamController$noArgs(getApi, "onFullscreened", null);
       this._onMaximized = F.ChromeStreamController$noArgs(getApi, "onMaximized", null);
       this._onMinimized = F.ChromeStreamController$noArgs(getApi, "onMinimized", null);
@@ -3140,7 +3144,7 @@ var $$ = {};
     "^": "ChromeObject;"
   },
   ChromeAppWindow: {
-    "^": "_ChromeAppWindow;_onBoundsChanged,_app0$_onClosed,_onFullscreened,_onMaximized,_onMinimized,_onRestored"
+    "^": "_ChromeAppWindow;_onBoundsChanged,_onClosed,_onFullscreened,_onMaximized,_onMinimized,_onRestored"
   },
   AppWindow: {
     "^": "_AppWindow;_streamMap,_onClosedStream,jsProxy"
@@ -3158,22 +3162,22 @@ var $$ = {};
     return H.IterableMixinWorkaround_singleWhere(C.List_46c, new V._createPermissionLevel_closure(value));
   }, "call$1", "_createPermissionLevel$closure", 2, 0, 80, 15, []],
   ChromeNotifications: {
-    "^": "ChromeApi;_onClosed,_onClicked,_onButtonClicked,_onPermissionLevelChanged",
+    "^": "ChromeApi;_notifications0$_onClosed,_onClicked,_onButtonClicked,_onPermissionLevelChanged",
     clear$1: [function(_, notificationId) {
       var t1, completer;
       t1 = $.get$chrome();
       if (J.$index$asx(t1, "notifications") == null)
-        this._throwNotAvailable$0();
+        this._notifications0$_throwNotAvailable$0();
       completer = F.ChromeCompleter$oneArg(null);
       J.$index$asx(t1, "notifications").callMethod$2("clear", [notificationId, completer._callback]);
       return completer._completer.future;
     }, "call$1", "get$clear", 2, 0, null, 76, []],
-    _throwNotAvailable$0: [function() {
+    _notifications0$_throwNotAvailable$0: [function() {
       throw H.wrapException(P.UnsupportedError$("'chrome.notifications' is not available"));
-    }, "call$0", "get$_throwNotAvailable", 0, 0, null],
+    }, "call$0", "get$_notifications0$_throwNotAvailable", 0, 0, null],
     ChromeNotifications$_$0: function() {
       var getApi = new V.ChromeNotifications$__closure(this);
-      this._onClosed = F.ChromeStreamController$twoArgs(getApi, "onClosed", V._createOnClosedEvent$closure(), null, V.OnClosedEvent);
+      this._notifications0$_onClosed = F.ChromeStreamController$twoArgs(getApi, "onClosed", V._createOnClosedEvent$closure(), null, V.OnClosedEvent);
       this._onClicked = F.ChromeStreamController$oneArg(getApi, "onClicked", F.selfConverter$closure(), null, J.JSString);
       this._onButtonClicked = F.ChromeStreamController$twoArgs(getApi, "onButtonClicked", V._createOnButtonClickedEvent$closure(), null, V.OnButtonClickedEvent);
       this._onPermissionLevelChanged = F.ChromeStreamController$oneArg(getApi, "onPermissionLevelChanged", V._createPermissionLevel$closure(), null, V.PermissionLevel);
@@ -3311,7 +3315,7 @@ var $$ = {};
           arg1 = t1.call$1(arg1);
         t1 = this.this_0._completer.future;
         if (t1._state !== 0)
-          H.throwExpression(new P.StateError("Future already completed"));
+          H.throwExpression(P.StateError$("Future already completed"));
         t1._asyncComplete$1(arg1);
       }
     }, function() {
@@ -3344,6 +3348,11 @@ var $$ = {};
         this._handlerAdded = false;
       }
     }, "call$0", "get$_removeHandler", 0, 0, 105],
+    ChromeStreamController$oneArg$4: function(_apiProvider, _eventName, transformer, returnVal, $T) {
+      var t1 = this.get$_ensureHandlerAdded();
+      this._controller = P.StreamController_StreamController$broadcast(this.get$_removeHandler(), t1, false, $T);
+      this._listener = new F.ChromeStreamController$oneArg_closure(this, transformer, returnVal);
+    },
     ChromeStreamController$noArgs$2: function(_apiProvider, _eventName, $T) {
       var t1 = this.get$_ensureHandlerAdded();
       this._controller = P.StreamController_StreamController$broadcast(this.get$_removeHandler(), t1, false, $T);
@@ -3353,11 +3362,6 @@ var $$ = {};
       var t1 = this.get$_ensureHandlerAdded();
       this._controller = P.StreamController_StreamController$broadcast(this.get$_removeHandler(), t1, false, $T);
       this._listener = new F.ChromeStreamController$twoArgs_closure(this, transformer, returnVal);
-    },
-    ChromeStreamController$oneArg$4: function(_apiProvider, _eventName, transformer, returnVal, $T) {
-      var t1 = this.get$_ensureHandlerAdded();
-      this._controller = P.StreamController_StreamController$broadcast(this.get$_removeHandler(), t1, false, $T);
-      this._listener = new F.ChromeStreamController$oneArg_closure(this, transformer, returnVal);
     },
     static: {ChromeStreamController$noArgs: function(_apiProvider, _eventName, $T) {
         var t1 = H.setRuntimeTypeInfo(new F.ChromeStreamController(_apiProvider, _eventName, P.StreamController_StreamController$broadcast(null, null, false, $T), false, null), [$T]);
@@ -3502,14 +3506,14 @@ var $$ = {};
       element = t1._current;
       if (test.call$1(element) === true) {
         if (foundMatching)
-          throw H.wrapException(P.StateError$("More than one matching element"));
+          throw H.wrapException(new P.StateError("More than one matching element"));
         result = element;
         foundMatching = true;
       }
     }
     if (foundMatching)
       return result;
-    throw H.wrapException(P.StateError$("No matching element"));
+    throw H.wrapException(new P.StateError("No matching element"));
   }, "call$2", "IterableMixinWorkaround_singleWhere$closure", 4, 0, null, 86, [], 88, []],
   IterableMixinWorkaround_toStringIterable: [function(iterable, leftDelimiter, rightDelimiter) {
     var result, i, t1;
@@ -3653,15 +3657,15 @@ var $$ = {};
     }
   },
   MappedListIterable: {
-    "^": "ListIterable;__internal$_source,_f",
+    "^": "ListIterable;_source,_f",
     _f$1: function(arg0) {
       return this._f.call$1(arg0);
     },
     get$length: function(_) {
-      return J.get$length$asx(this.__internal$_source);
+      return J.get$length$asx(this._source);
     },
     elementAt$1: [function(_, index) {
-      return this._f$1(J.elementAt$1$ax(this.__internal$_source, index));
+      return this._f$1(J.elementAt$1$ax(this._source, index));
     }, "call$1", "get$elementAt", 2, 0, null, 24, []],
     $asListIterable: function($S, $T) {
       return [$T];
@@ -3747,6 +3751,25 @@ var $$ = {};
     else
       return errorHandler;
   }, "call$2", "_registerErrorHandler$closure", 4, 0, null, 101, [], 102, []],
+  Future_Future$sync: function(computation, $T) {
+    var result, T0, error, stackTrace, t1, t2, exception;
+    try {
+      result = computation.call$0();
+      t1 = T0;
+      t2 = H.setRuntimeTypeInfo(new P._Future(0, $.Zone__current, null, null, null, null, null, null), [t1]);
+      t2._async$_Future$immediate$1(result, t1);
+      return t2;
+    } catch (exception) {
+      t1 = H.unwrapException(exception);
+      error = t1;
+      stackTrace = new H._StackTrace(exception, null);
+      t1 = T0;
+      t2 = H.setRuntimeTypeInfo(new P._Future(0, $.Zone__current, null, null, null, null, null, null), [t1]);
+      t2._async$_Future$immediateError$2(error, stackTrace, t1);
+      return t2;
+    }
+
+  },
   _asyncRunCallbackLoop: [function() {
     var entry = $._nextCallback;
     for (; entry != null;) {
@@ -4148,7 +4171,7 @@ var $$ = {};
         throw H.wrapException(new P.ArgumentError("Error must not be null"));
       t1 = this.future;
       if (t1._state !== 0)
-        throw H.wrapException(new P.StateError("Future already completed"));
+        throw H.wrapException(P.StateError$("Future already completed"));
       t1._asyncCompleteError$2(error, stackTrace);
     }, function(error) {
       return this.completeError$2(error, null);
@@ -4226,7 +4249,7 @@ var $$ = {};
         listener.set$_nextListener(this._resultOrListeners);
         this._resultOrListeners = listener;
       }
-    }, "call$1", "get$_addListener", 2, 0, null, 143, []],
+    }, "call$1", "get$_addListener", 2, 0, null, 142, []],
     _removeListeners$0: [function() {
       var current, prev, next;
       current = this._resultOrListeners;
@@ -4279,12 +4302,18 @@ var $$ = {};
     _asyncCompleteError$2: [function(error, stackTrace) {
       var t1;
       if (this._state !== 0)
-        H.throwExpression(new P.StateError("Future already completed"));
+        H.throwExpression(P.StateError$("Future already completed"));
       this._state = 1;
       t1 = this._zone;
       t1.toString;
       P._rootScheduleMicrotask(t1, null, t1, new P._Future__asyncCompleteError_closure(this, error, stackTrace));
     }, "call$2", "get$_asyncCompleteError", 4, 0, null, 110, [], 111, []],
+    _async$_Future$immediateError$2: function(error, stackTrace, $T) {
+      this._asyncCompleteError$2(error, stackTrace);
+    },
+    _async$_Future$immediate$1: function(value, $T) {
+      this._asyncComplete$1(value);
+    },
     $is_Future: true,
     $isFuture: true,
     static: {"^": "_Future__INCOMPLETE,_Future__PENDING_COMPLETE,_Future__CHAINED,_Future__VALUE,_Future__ERROR", _Future$: function($T) {
@@ -4678,9 +4707,6 @@ var $$ = {};
     $isFunction: true
   },
   StreamSubscription: {
-    "^": "Object;"
-  },
-  EventSink: {
     "^": "Object;"
   },
   _StreamController: {
@@ -5154,11 +5180,11 @@ var $$ = {};
       subscription.onError$1(0, onError);
       subscription.onDone$1(onDone);
       return subscription;
-    }, function(onData) {
-      return this.listen$4$cancelOnError$onDone$onError(onData, null, null, null);
-    }, "listen$1", function(onData, onDone, onError) {
+    }, function(onData, onDone, onError) {
       return this.listen$4$cancelOnError$onDone$onError(onData, null, onDone, onError);
-    }, "listen$3$onDone$onError", "call$4$cancelOnError$onDone$onError", null, null, "get$listen", 2, 7, null, 53, 53, 53, 191, [], 177, [], 192, [], 114, []],
+    }, "listen$3$onDone$onError", function(onData) {
+      return this.listen$4$cancelOnError$onDone$onError(onData, null, null, null);
+    }, "listen$1", "call$4$cancelOnError$onDone$onError", null, null, "get$listen", 2, 7, null, 53, 53, 53, 191, [], 177, [], 192, [], 114, []],
     _createSubscription$1: [function(cancelOnError) {
       var t1, t2;
       t1 = $.Zone__current;
@@ -5339,14 +5365,14 @@ var $$ = {};
       var t1, t2;
       t1 = this.get$_handleData();
       t2 = this.get$_handleError();
-      this._subscription = this._stream._source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
+      this._subscription = this._stream._async$_source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
     },
     $as_BufferingStreamSubscription: function($S, $T) {
       return [$T];
     }
   },
   _MapStream: {
-    "^": "_ForwardingStream;_transform,_source",
+    "^": "_ForwardingStream;_transform,_async$_source",
     _transform$1: function(arg0) {
       return this._transform.call$1(arg0);
     },
@@ -6993,13 +7019,15 @@ var $$ = {};
   DateTime: {
     "^": "Object;millisecondsSinceEpoch,isUtc",
     $eq: [function(_, other) {
-      var t1;
+      var t1, t2;
       if (other == null)
         return false;
       t1 = J.getInterceptor(other);
       if (typeof other !== "object" || other === null || !t1.$isDateTime)
         return false;
-      return this.millisecondsSinceEpoch === other.millisecondsSinceEpoch && this.isUtc === other.isUtc;
+      t1 = this.millisecondsSinceEpoch;
+      t2 = other.millisecondsSinceEpoch;
+      return (t1 == null ? t2 == null : t1 === t2) && this.isUtc === other.isUtc;
     }, "call$1", "get$==", 2, 0, null, 71, []],
     get$hashCode: function(_) {
       return this.millisecondsSinceEpoch;
@@ -7026,6 +7054,7 @@ var $$ = {};
       H.Primitives_lazyAsJsDate(this);
     },
     DateTime$fromMillisecondsSinceEpoch$2$isUtc: function(millisecondsSinceEpoch, isUtc) {
+      millisecondsSinceEpoch.toString;
       if (Math.abs(millisecondsSinceEpoch) > 8640000000000000)
         throw H.wrapException(new P.ArgumentError(millisecondsSinceEpoch));
     },
@@ -7033,10 +7062,6 @@ var $$ = {};
     static: {"^": "DateTime_MONDAY,DateTime_TUESDAY,DateTime_WEDNESDAY,DateTime_THURSDAY,DateTime_FRIDAY,DateTime_SATURDAY,DateTime_SUNDAY,DateTime_DAYS_PER_WEEK,DateTime_JANUARY,DateTime_FEBRUARY,DateTime_MARCH,DateTime_APRIL,DateTime_MAY,DateTime_JUNE,DateTime_JULY,DateTime_AUGUST,DateTime_SEPTEMBER,DateTime_OCTOBER,DateTime_NOVEMBER,DateTime_DECEMBER,DateTime_MONTHS_PER_YEAR,DateTime__MAX_MILLISECONDS_SINCE_EPOCH", DateTime$fromMillisecondsSinceEpoch: function(millisecondsSinceEpoch, isUtc) {
         var t1 = new P.DateTime(millisecondsSinceEpoch, isUtc);
         t1.DateTime$fromMillisecondsSinceEpoch$2$isUtc(millisecondsSinceEpoch, isUtc);
-        return t1;
-      }, DateTime$_now: function() {
-        var t1 = new P.DateTime(Date.now(), false);
-        t1.DateTime$_now$0();
         return t1;
       }}
   },
@@ -7362,7 +7387,7 @@ var $$ = {};
     }, "call$0", "get$toString", 0, 0, null],
     noSuchMethod$1: [function(_, invocation) {
       throw H.wrapException(P.NoSuchMethodError$(this, invocation.get$memberName(), invocation.get$positionalArguments(), invocation.get$namedArguments(), null));
-    }, "call$1", "get$noSuchMethod", 2, 0, null, 146, []]
+    }, "call$1", "get$noSuchMethod", 2, 0, null, 145, []]
   },
   StackTrace: {
     "^": "Object;"
@@ -7479,7 +7504,7 @@ var $$ = {};
         H.unwrapException(exception);
       }
 
-    }, "call$3", "get$setProperty", 4, 2, null, 53, 40, [], 15, [], 142, []],
+    }, "call$3", "get$setProperty", 4, 2, null, 53, 40, [], 15, [], 141, []],
     "%": "CSS2Properties|CSSStyleDeclaration|MSStyleCSSProperties"
   },
   DomError: {
@@ -7524,7 +7549,7 @@ var $$ = {};
     "%": "ErrorEvent"
   },
   Event: {
-    "^": "Interceptor;",
+    "^": "Interceptor;timeStamp=",
     preventDefault$0: [function(receiver) {
       return receiver.preventDefault();
     }, "call$0", "get$preventDefault", 0, 0, null],
@@ -7538,10 +7563,10 @@ var $$ = {};
     "^": "Interceptor;",
     addEventListener$3: [function(receiver, type, listener, useCapture) {
       return receiver.addEventListener(type, H.convertDartClosureToJS(listener, 1), useCapture);
-    }, "call$3", "get$addEventListener", 4, 2, null, 53, 54, [], 143, [], 144, []],
+    }, "call$3", "get$addEventListener", 4, 2, null, 53, 54, [], 142, [], 143, []],
     removeEventListener$3: [function(receiver, type, listener, useCapture) {
       return receiver.removeEventListener(type, H.convertDartClosureToJS(listener, 1), useCapture);
-    }, "call$3", "get$removeEventListener", 4, 2, null, 53, 54, [], 143, [], 144, []],
+    }, "call$3", "get$removeEventListener", 4, 2, null, 53, 54, [], 142, [], 143, []],
     "%": "MediaStream|Performance;EventTarget"
   },
   FieldSetElement: {
@@ -7788,7 +7813,7 @@ var $$ = {};
     }, "call$1", "get$getPropertyValue", 2, 0, null, 40, []],
     setProperty$3: [function(_, propertyName, value, priority) {
       this._elementCssStyleDeclarationSetIterable.forEach$1(0, new W._CssStyleDeclarationSet_setProperty_closure(propertyName, value, priority));
-    }, "call$3", "get$setProperty", 4, 2, null, 53, 40, [], 15, [], 142, []],
+    }, "call$3", "get$setProperty", 4, 2, null, 53, 40, [], 15, [], 141, []],
     _CssStyleDeclarationSet$1: function(_elementIterable) {
       this._elementCssStyleDeclarationSetIterable = H.setRuntimeTypeInfo(new H.MappedListIterable(P.List_List$from(this._elementIterable, true, null), new W._CssStyleDeclarationSet_closure()), [null, null]);
     },
@@ -7979,9 +8004,9 @@ var $$ = {};
     "^": "Object;_eventType"
   },
   _EventStream: {
-    "^": "Stream;_html$_target,_eventType,_useCapture",
+    "^": "Stream;_target,_eventType,_useCapture",
     listen$4$cancelOnError$onDone$onError: [function(onData, cancelOnError, onDone, onError) {
-      var t1 = new W._EventStreamSubscription(0, this._html$_target, this._eventType, W._wrapZone(onData), this._useCapture);
+      var t1 = new W._EventStreamSubscription(0, this._target, this._eventType, W._wrapZone(onData), this._useCapture);
       t1.$builtinTypeInfo = this.$builtinTypeInfo;
       t1._tryResume$0();
       return t1;
@@ -7990,20 +8015,20 @@ var $$ = {};
     }, "listen$3$onDone$onError", "call$4$cancelOnError$onDone$onError", null, "get$listen", 2, 7, null, 53, 53, 53, 191, [], 177, [], 192, [], 114, []]
   },
   _ElementEventStreamImpl: {
-    "^": "_EventStream;_html$_target,_eventType,_useCapture"
+    "^": "_EventStream;_target,_eventType,_useCapture"
   },
   _EventStreamSubscription: {
-    "^": "StreamSubscription;_pauseCount,_html$_target,_eventType,_html$_onData,_useCapture",
+    "^": "StreamSubscription;_pauseCount,_target,_eventType,_html$_onData,_useCapture",
     cancel$0: [function() {
-      if (this._html$_target == null)
+      if (this._target == null)
         return;
       this._unlisten$0();
-      this._html$_target = null;
+      this._target = null;
       this._html$_onData = null;
       return;
     }, "call$0", "get$cancel", 0, 0, null],
     pause$1: [function(_, resumeSignal) {
-      if (this._html$_target == null)
+      if (this._target == null)
         return;
       this._pauseCount = this._pauseCount + 1;
       this._unlisten$0();
@@ -8014,7 +8039,7 @@ var $$ = {};
       return this._pauseCount > 0;
     },
     resume$0: [function() {
-      if (this._html$_target == null || this._pauseCount <= 0)
+      if (this._target == null || this._pauseCount <= 0)
         return;
       this._pauseCount = this._pauseCount - 1;
       this._tryResume$0();
@@ -8022,12 +8047,12 @@ var $$ = {};
     _tryResume$0: [function() {
       var t1 = this._html$_onData;
       if (t1 != null && this._pauseCount <= 0)
-        J.addEventListener$3$x(this._html$_target, this._eventType, t1, this._useCapture);
+        J.addEventListener$3$x(this._target, this._eventType, t1, this._useCapture);
     }, "call$0", "get$_tryResume", 0, 0, null],
     _unlisten$0: [function() {
       var t1 = this._html$_onData;
       if (t1 != null)
-        J.removeEventListener$3$x(this._html$_target, this._eventType, t1, this._useCapture);
+        J.removeEventListener$3$x(this._target, this._eventType, t1, this._useCapture);
     }, "call$0", "get$_unlisten", 0, 0, null]
   },
   ImmutableListMixin: {
@@ -8061,16 +8086,16 @@ var $$ = {};
     }
   },
   _DOMWindowCrossFrame: {
-    "^": "Object;_window",
+    "^": "Object;_html$_window",
     get$top: function(_) {
-      return W._DOMWindowCrossFrame__createSafe(this._window.top);
+      return W._DOMWindowCrossFrame__createSafe(this._html$_window.top);
     },
     addEventListener$3: [function(_, type, listener, useCapture) {
       return H.throwExpression(P.UnimplementedError$(null));
-    }, "call$3", "get$addEventListener", 4, 2, null, 53, 54, [], 143, [], 144, []],
+    }, "call$3", "get$addEventListener", 4, 2, null, 53, 54, [], 142, [], 143, []],
     removeEventListener$3: [function(_, type, listener, useCapture) {
       return H.throwExpression(P.UnimplementedError$(null));
-    }, "call$3", "get$removeEventListener", 4, 2, null, 53, 54, [], 143, [], 144, []],
+    }, "call$3", "get$removeEventListener", 4, 2, null, 53, 54, [], 142, [], 143, []],
     static: {_DOMWindowCrossFrame__createSafe: [function(w) {
         if (w === window)
           return w;
@@ -8522,8 +8547,8 @@ var $$ = {};
       if (t1.$lt(index, 0) || t1.$ge(index, $length))
         throw H.wrapException(P.RangeError$range(index, 0, $length));
       else
-        throw H.wrapException(P.ArgumentError$("Invalid list index " + H.S(index)));
-    }, "call$2", "get$_invalidIndex", 4, 0, null, 24, [], 145, []],
+        throw H.wrapException(new P.ArgumentError("Invalid list index " + H.S(index)));
+    }, "call$2", "get$_invalidIndex", 4, 0, null, 24, [], 144, []],
     $isTypedData: true,
     "%": ";ArrayBufferView;NativeTypedArray|NativeTypedArray_ListMixin|NativeTypedArray_ListMixin_FixedLengthListMixin|NativeTypedArrayOfDouble|NativeTypedArray_ListMixin0|NativeTypedArray_ListMixin_FixedLengthListMixin0|NativeTypedArrayOfInt"
   },
@@ -8977,6 +9002,46 @@ var $$ = {};
     $isFunction: true
   }
 }],
+["", "generic_view.dart", , T, {
+  "^": "",
+  AnimationFrame: {
+    "^": "Object;"
+  },
+  WindowAnimationFrame: {
+    "^": "AnimationFrame;_window,_onDraw,_onExpire,_id,isCompleted",
+    get$onDraw: function() {
+      return H.setRuntimeTypeInfo(new P._ControllerStream(this._onDraw), [null]);
+    },
+    callback$1: [function(time) {
+      var t1;
+      if (this.isCompleted)
+        throw H.wrapException(new P.StateError("Frame can not be drawn once drawn or cancelled."));
+      t1 = this._onDraw;
+      if (t1._state >= 4)
+        H.throwExpression(t1._badEventState$0());
+      t1._async$_add$1(time);
+      this.isCompleted = true;
+      t1 = this._onExpire;
+      if (t1._state >= 4)
+        H.throwExpression(t1._badEventState$0());
+      t1._async$_add$1(null);
+    }, "call$1", "get$callback", 2, 0, 168, 169, []],
+    cancel$0: [function() {
+      var t1, t2;
+      if (this.isCompleted)
+        throw H.wrapException(new P.StateError("Frame can not be cancelled once drawn or cancelled."));
+      t1 = this._window;
+      t2 = this._id;
+      C.Window_methods._ensureRequestAnimationFrame$0(t1);
+      t1.cancelAnimationFrame(t2);
+      this.isCompleted = true;
+      t2 = this._onExpire;
+      if (t2._state >= 4)
+        H.throwExpression(t2._badEventState$0());
+      t2._async$_add$1(null);
+    }, "call$0", "get$cancel", 0, 0, null]
+  }
+}],
 ["html_common", "dart:html_common", , P, {
   "^": "",
   Device_isOpera: function() {
@@ -9054,26 +9119,56 @@ var $$ = {};
 ["pomeranian", "pomeranianchrome.dart", , K, {
   "^": "",
   main: [function() {
-    var t1 = $.get$app().window;
-    R.View$(L.Controller$(t1.current$0().jsProxy._jsObject["alarm"]), t1.current$0(), window, t1.current$0().jsProxy._jsObject["alarm"]);
-  }, "call$0", "main$closure", 0, 0, 105]
+    var controller, t1;
+    controller = L.Controller$($.get$app().window.current$0().jsProxy._jsObject["alarm"]);
+    t1 = H.setRuntimeTypeInfo(new W._EventStream(window, C.EventStreamProvider_load._eventType, false), [null]);
+    H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new K.main_closure()), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+    controller.syncLocalStorage$0().then$1(new K.main_closure0(controller));
+  }, "call$0", "main$closure", 0, 0, 105],
+  main_closure: {
+    "^": "Closure:82;",
+    call$1: [function(_) {
+      $.viewIsReady = true;
+    }, "call$1", null, 2, 0, null, 183, [], "call"],
+    $isFunction: true
+  },
+  main_closure0: {
+    "^": "Closure:82;controller_0",
+    call$1: [function(_) {
+      return R.View$(this.controller_0, $.get$app().window.current$0(), window, $.viewIsReady);
+    }, "call$1", null, 2, 0, null, 183, [], "call"],
+    $isFunction: true
+  }
 },
 1],
 ["pomeranian_controller", "pomeranian_controller.dart", , L, {
   "^": "",
   Controller: {
-    "^": "Object;_onRaise,_pomeranian_controller$_onAlarm,timeout",
+    "^": "Object;_onRaise,_onAlarm,alarmTimeout,alarmName,_lastAction",
+    syncLocalStorage$0: [function() {
+      var t1, t2, completer;
+      $.get$storage().toString;
+      t1 = J.$index$asx(J.$index$asx($.get$chrome(), "storage"), "local");
+      t1 = t1 == null ? null : new N.LocalStorageArea(t1);
+      t2 = H.fillLiteralMap(["lastAction", 0, "wasRunningWhenClosed", false], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null));
+      t1.toString;
+      completer = F.ChromeCompleter$oneArg(F.mapify$closure());
+      t1.jsProxy.callMethod$2("get", [F.jsify(t2), completer._callback]);
+      return completer._completer.future.then$1(new L.Controller_syncLocalStorage_closure(this));
+    }, "call$0", "get$syncLocalStorage", 0, 0, null],
     Controller$1: function(alarm) {
       var t1;
-      if (alarm != null)
-        this.timeout = P.DateTime$fromMillisecondsSinceEpoch(J.round$0$n(alarm.o.jsProxy._jsObject.scheduledTime), false);
-      t1 = $.get$alarms()._onAlarm._controller;
+      if (alarm != null) {
+        this.alarmTimeout = P.DateTime$fromMillisecondsSinceEpoch(J.round$0$n(alarm.o.jsProxy._jsObject.scheduledTime), false);
+        this.alarmName = alarm.o.jsProxy._jsObject.name;
+      }
+      t1 = $.get$alarms()._alarms0$_onAlarm._controller;
       H.setRuntimeTypeInfo(new P._BroadcastStream(t1), [H.getTypeArgumentByIndex(t1, 0)]).listen$1(new L.Controller_closure(this));
       t1 = $.get$notifications()._onClicked._controller;
       H.setRuntimeTypeInfo(new P._BroadcastStream(t1), [H.getTypeArgumentByIndex(t1, 0)]).listen$1(new L.Controller_closure0(this));
     },
     static: {Controller$: function(alarm) {
-        var t1 = new L.Controller(P.StreamController_StreamController(null, null, null, null, false, null), P.StreamController_StreamController(null, null, null, null, false, null), null);
+        var t1 = new L.Controller(P.StreamController_StreamController(null, null, null, null, false, null), P.StreamController_StreamController(null, null, null, null, false, null), null, null, 0);
         t1.Controller$1(alarm);
         return t1;
       }}
@@ -9100,12 +9195,12 @@ var $$ = {};
       t1.toString;
       t2 = $.get$chrome();
       if (J.$index$asx(t2, "notifications") == null)
-        t1._throwNotAvailable$0();
+        t1._notifications0$_throwNotAvailable$0();
       completer = F.ChromeCompleter$oneArg(null);
       J.$index$asx(t2, "notifications").callMethod$2("create", ["_pomerananianNotification", F.jsify(notificationOption), completer._callback]);
       t1 = this.this_0;
-      t1.timeout = null;
-      t1 = t1._pomeranian_controller$_onAlarm;
+      t1.alarmTimeout = null;
+      t1 = t1._onAlarm;
       if (t1._state >= 4)
         H.throwExpression(t1._badEventState$0());
       t1._async$_add$1(null);
@@ -9122,34 +9217,49 @@ var $$ = {};
       $.get$notifications().clear$1(0, notification);
     }, "call$1", null, 2, 0, null, 216, [], "call"],
     $isFunction: true
+  },
+  Controller_syncLocalStorage_closure: {
+    "^": "Closure:82;this_0",
+    call$1: [function(map) {
+      var t1 = J.getInterceptor$asx(map);
+      this.this_0._lastAction = t1.$index(map, "lastAction");
+      return t1.$index(map, "wasRunningWhenClosed");
+    }, "call$1", null, 2, 0, null, 161, [], "call"],
+    $isFunction: true
   }
 }],
 ["pomeranian_view", "pomeranian_view.dart", , R, {
   "^": "",
   View: {
-    "^": "Object;_pomeranian_view$_window,_jsWindow,_app,_focusButton,_buttonsContainerWidth,_lastActionSync,_lastButton,currentlyHighlighted,_timerLoopFrame,_redrawClockTimer,currentAnimation,previousTime",
-    _getLocalStorage$0: [function() {
-      var t1, t2, completer;
-      $.get$storage().toString;
-      t1 = J.$index$asx(J.$index$asx($.get$chrome(), "storage"), "local");
-      t1 = t1 == null ? null : new N.LocalStorageArea(t1);
-      t2 = H.fillLiteralMap(["lastAction", 0, "wasRunningWhenClosed", false], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null));
-      t1.toString;
-      completer = F.ChromeCompleter$oneArg(F.mapify$closure());
-      t1.jsProxy.callMethod$2("get", [F.jsify(t2), completer._callback]);
-      return completer._completer.future.then$1(new R.View__getLocalStorage_closure(this));
-    }, "call$0", "get$_getLocalStorage", 0, 0, null],
-    get$nextButton: function() {
-      var t1, t2;
-      if (J.$gt$n(this._lastActionSync, 7)) {
-        t1 = J.$mod$n(this._lastActionSync, 8);
-        this._lastActionSync = t1;
+    "^": "Object;_pomeranian_view$_window,_jsWindow,_app,_focusButton,_lastButton,_buttonsContainerWidth,_currentlyHighlightedButton,_timerLoopFrame,_redrawClockTimer,_previousTime,_currentAnimation,__timerLoopAnimationFrame",
+    requestAnimationFrame$0: [function(_) {
+      var t1, t2, t3;
+      t1 = this._jsWindow;
+      t2 = new T.WindowAnimationFrame(t1, P.StreamController_StreamController(null, null, null, null, true, null), P.StreamController_StreamController(null, null, null, null, true, null), null, false);
+      t3 = t2.get$callback();
+      C.Window_methods._ensureRequestAnimationFrame$0(t1);
+      t2._id = C.Window_methods._requestAnimationFrame$1(t1, W._wrapZone(t3));
+      return t2;
+    }, "call$0", "get$requestAnimationFrame", 0, 0, 217],
+    requestFirstAnimationFrame$0: [function() {
+      var t1 = this._currentAnimation._data;
+      if (t1 == null)
+        return P.Future_Future$sync(this.get$requestAnimationFrame(this), null);
+      else
+        return t1.stop$0(0).then$1(new R.View_requestFirstAnimationFrame_closure(this));
+    }, "call$0", "get$requestFirstAnimationFrame", 0, 0, null],
+    get$_nextButton: function() {
+      var t1, t2, t3;
+      t1 = this._app;
+      if (J.$gt$n(t1._lastAction, 7)) {
+        t2 = J.$mod$n(t1._lastAction, 8);
+        t1._lastAction = t2;
         $.get$storage().toString;
-        t2 = J.$index$asx(J.$index$asx($.get$chrome(), "storage"), "local");
-        t2 = t2 == null ? null : new N.LocalStorageArea(t2);
-        t2.set$1(H.fillLiteralMap(["lastAction", t1], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
+        t3 = J.$index$asx(J.$index$asx($.get$chrome(), "storage"), "local");
+        t3 = t3 == null ? null : new N.LocalStorageArea(t3);
+        t3.set$1(H.fillLiteralMap(["lastAction", t2], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
       }
-      switch (this._lastActionSync) {
+      switch (t1._lastAction) {
         case 0:
         case 2:
         case 4:
@@ -9163,113 +9273,128 @@ var $$ = {};
           return C.Button_2;
       }
     },
-    get$timerLoopAnimationFrame: function() {
-      var t1, t2, completer;
-      t1 = this._timerLoopFrame;
-      if (t1 != null) {
-        t2 = this._jsWindow;
-        C.Window_methods._ensureRequestAnimationFrame$0(t2);
-        t2.cancelAnimationFrame(t1);
-      }
-      t1 = J.JSNumber;
-      completer = H.setRuntimeTypeInfo(new P._SyncCompleter(P._Future$(t1)), [t1]);
+    get$_timerLoopAnimationFrame: function() {
+      var t1, t2, t3, t4;
+      t1 = this.__timerLoopAnimationFrame;
+      if (t1 != null)
+        t1.cancel$0();
       t1 = this._jsWindow;
+      t2 = P.StreamController_StreamController(null, null, null, null, true, null);
+      t3 = P.StreamController_StreamController(null, null, null, null, true, null);
+      t2 = new T.WindowAnimationFrame(t1, t2, t3, null, false);
+      t4 = t2.get$callback();
       C.Window_methods._ensureRequestAnimationFrame$0(t1);
-      this._timerLoopFrame = C.Window_methods._requestAnimationFrame$1(t1, W._wrapZone(new R.View_timerLoopAnimationFrame_closure(this, completer)));
-      return completer.future;
+      t2._id = C.Window_methods._requestAnimationFrame$1(t1, W._wrapZone(t4));
+      this.__timerLoopAnimationFrame = t2;
+      H.setRuntimeTypeInfo(new P._ControllerStream(t3), [null]).listen$1(new R.View__timerLoopAnimationFrame_closure(this));
+      return this.__timerLoopAnimationFrame;
     },
-    clickAction$1: [function(button) {
-      return new R.View_clickAction_closure(this, button);
-    }, "call$1", "get$clickAction", 2, 0, null, 217, []],
-    timerLoop$0: [function() {
-      var t1, t2, newTime;
-      t1 = this._app.timeout;
+    _clickActionButton$1: [function(button) {
+      return new R.View__clickActionButton_closure(this, button);
+    }, "call$1", "get$_clickActionButton", 2, 0, null, 218, []],
+    _timerLoop$0: [function() {
+      var t1, t2, ms, newTime;
+      t1 = this._app.alarmTimeout;
       if (t1 == null)
         return;
-      t2 = P.DateTime$_now();
-      newTime = C.JSNumber_methods._tdivFast$1(P.Duration$(0, 0, 0, t1.millisecondsSinceEpoch - t2.millisecondsSinceEpoch, 0, 0)._duration, 1000000);
-      if (newTime !== this.previousTime) {
-        this.previousTime = newTime;
-        this.get$timerLoopAnimationFrame().then$1(this.get$redrawClock());
+      t2 = Date.now();
+      new P.DateTime(t2, false).DateTime$_now$0();
+      ms = t1.millisecondsSinceEpoch;
+      if (typeof ms !== "number")
+        return ms.$sub();
+      if (typeof t2 !== "number")
+        return H.iae(t2);
+      newTime = C.JSNumber_methods._tdivFast$1(P.Duration$(0, 0, 0, ms - t2, 0, 0)._duration, 1000000);
+      if (newTime !== this._previousTime) {
+        this._previousTime = newTime;
+        H.setRuntimeTypeInfo(new P._ControllerStream(this.get$_timerLoopAnimationFrame()._onDraw), [null]).listen$1(this.get$_redrawClock());
       }
-      this._redrawClockTimer = P.Timer_Timer(P.Duration$(0, 0, 0, 100, 0, 0), this.get$timerLoop());
-    }, "call$0", "get$timerLoop", 0, 0, 105],
-    redrawClock$1: [function(clock) {
+      this._redrawClockTimer = P.Timer_Timer(P.Duration$(0, 0, 0, 100, 0, 0), this.get$_timerLoop());
+    }, "call$0", "get$_timerLoop", 0, 0, 105],
+    _redrawClock$1: [function(clock) {
       var t1, previousMinutes, previousSeconds, secondsText;
-      t1 = this.previousTime;
+      t1 = this._previousTime;
       previousMinutes = C.JSNumber_methods._tdivFast$1(t1, 60);
       previousSeconds = C.JSNumber_methods.$mod(t1, 60);
       t1 = previousSeconds < 10 ? "0" : "";
       secondsText = t1 + C.JSNumber_methods.toString$0(previousSeconds);
       this._jsWindow.document.querySelector("#timer_text_id").textContent = C.JSNumber_methods.toString$0(previousMinutes) + ":" + secondsText;
-    }, "call$1", "get$redrawClock", 2, 0, 168, 218, []],
-    highlightNextButton$0: [function() {
+    }, "call$1", "get$_redrawClock", 2, 0, 168, 219, []],
+    _highlightNextButton$0: [function() {
       var nextHighlight, t1;
-      if (this.get$nextButton().value === C.Button_0.value)
+      if (this.get$_nextButton().value === C.Button_0.value)
         nextHighlight = "#pomodoro_button_id";
       else
-        nextHighlight = this.get$nextButton().value === C.Button_1.value ? "#short_button_id" : "#long_button_id";
+        nextHighlight = this.get$_nextButton().value === C.Button_1.value ? "#short_button_id" : "#long_button_id";
       t1 = this._jsWindow;
-      J.get$classes$x(t1.document.querySelector(this.currentlyHighlighted)).remove$1(0, "focused");
+      J.get$classes$x(t1.document.querySelector(this._currentlyHighlightedButton)).remove$1(0, "focused");
       J.get$classes$x(t1.document.querySelector(nextHighlight)).add$1(0, "focused");
-      this.currentlyHighlighted = nextHighlight;
-    }, "call$0", "get$highlightNextButton", 0, 0, null],
-    toStopState$0: [function() {
-      var t1, t2, t3, t4, t5, t6, nextAnimation;
-      t1 = this._redrawClockTimer;
-      if (t1 != null) {
-        t1.cancel$0();
+      this._currentlyHighlightedButton = nextHighlight;
+    }, "call$0", "get$_highlightNextButton", 0, 0, null],
+    _animateToStopState$0: [function() {
+      var t1, t2, t3, t4, t5, t6;
+      t1 = {};
+      t2 = this._redrawClockTimer;
+      if (t2 != null) {
+        t2.cancel$0();
         this._redrawClockTimer = null;
       }
-      t1 = this.currentAnimation;
-      t2 = t1._data;
-      if (t2 != null) {
-        t3 = J.getInterceptor(t2);
-        t3 = typeof t2 === "object" && t2 !== null && !!t3.$isTransitionButtonsAnimation;
+      t1.nextAnimation_0 = null;
+      t2 = this._currentAnimation;
+      t3 = t2._data;
+      if (t3 != null) {
+        t4 = J.getInterceptor(t3);
+        t4 = typeof t3 === "object" && t3 !== null && !!t4.$isTransitionButtonsAnimation;
       } else
-        t3 = false;
-      t4 = this._jsWindow;
+        t4 = false;
       t5 = this._buttonsContainerWidth;
       t6 = this._lastButton;
-      nextAnimation = t3 ? K.TransitionButtonsAnimation$(t4, t1, 400, t5, null, t6, false, new R.View_toStopState_closure(t2)) : K.TransitionButtonsAnimation$(t4, t1, 400, t5, null, t6, false, null);
-      $.get$storage().toString;
-      t1 = J.$index$asx(J.$index$asx($.get$chrome(), "storage"), "local");
-      t1 = t1 == null ? null : new N.LocalStorageArea(t1);
-      t1.set$1(H.fillLiteralMap(["wasRunningWhenClosed", false], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
-      this.animateNow$0().then$1(nextAnimation.get$drawFirstFrame());
-      this.highlightNextButton$0();
-      this.get$timerLoopAnimationFrame().then$1(new R.View_toStopState_closure0(this));
-    }, "call$0", "get$toStopState", 0, 0, null],
-    clickStop$1: [function($event) {
-      var t1, t2;
-      t1 = this.currentAnimation._data;
+      if (t4)
+        t1.nextAnimation_0 = K.TransitionButtonsAnimation$(this, t2, 400, t5, null, t6, false, new R.View__animateToStopState_closure(t3));
+      else
+        t1.nextAnimation_0 = K.TransitionButtonsAnimation$(this, t2, 400, t5, null, t6, false, null);
+      this.requestFirstAnimationFrame$0().then$1(new R.View__animateToStopState_closure0(t1, this));
+      this._highlightNextButton$0();
+      H.setRuntimeTypeInfo(new P._ControllerStream(this.get$_timerLoopAnimationFrame()._onDraw), [null]).listen$1(new R.View__animateToStopState_closure1(this));
+    }, "call$0", "get$_animateToStopState", 0, 0, null],
+    _clickStop$1: [function($event) {
+      var t1, t2, t3, t4;
+      t1 = this._currentAnimation._data;
       if (t1 != null) {
         t2 = J.getInterceptor(t1);
         t2 = typeof t1 === "object" && t1 !== null && !!t2.$isTransitionButtonsAnimation && !H.interceptedTypeCast(t1, "$isTransitionButtonsAnimation").isGoingToStop;
       } else
         t2 = false;
       if (t2) {
-        this.clickAction$1(H.interceptedTypeCast(t1, "$isTransitionButtonsAnimation").focusButton).call$1($event);
+        this._clickActionButton$1(H.interceptedTypeCast(t1, "$isTransitionButtonsAnimation").focusButton).call$1($event);
         return;
       }
       J.preventDefault$0$x($event);
-      this._lastActionSync = 0;
-      $.get$storage().toString;
-      t1 = J.$index$asx(J.$index$asx($.get$chrome(), "storage"), "local");
-      t1 = t1 == null ? null : new N.LocalStorageArea(t1);
-      t1.set$1(H.fillLiteralMap(["lastAction", 0], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
-      this.toStopState$0();
+      t1 = this._app;
+      t1._lastAction = 0;
+      t2 = $.get$storage();
+      t2.toString;
+      t3 = $.get$chrome();
+      t4 = J.$index$asx(J.$index$asx(t3, "storage"), "local");
+      t4 = t4 == null ? null : new N.LocalStorageArea(t4);
+      t4.set$1(H.fillLiteralMap(["lastAction", 0], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
+      this._animateToStopState$0();
       $.get$alarms().clearAll$0();
-      this._app.timeout = null;
-    }, "call$1", "get$clickStop", 2, 0, 219, 189, []],
-    resizeWindow$1: [function($event) {
-      var t1, bounds, t2, t3, t4, t5, t6, t7, t8, t9, timerText, computedMarginTop, computedMarginBottom;
+      t1.alarmTimeout = null;
+      t1.alarmName = null;
+      t2.toString;
+      t3 = J.$index$asx(J.$index$asx(t3, "storage"), "local");
+      t1 = t3 == null ? null : new N.LocalStorageArea(t3);
+      t1.set$1(H.fillLiteralMap(["wasRunningWhenClosed", false], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
+    }, "call$1", "get$_clickStop", 2, 0, 220, 189, []],
+    _resizeWindow$1: [function($event) {
+      var t1, bounds, t2, t3, t4, t5, t6, t7, t8, timerText, computedMarginTop, computedMarginBottom;
       t1 = this._pomeranian_view$_window.jsProxy.callMethod$1("getBounds");
       bounds = (t1 == null ? null : new Z.Bounds0(t1)).jsProxy;
       t1 = J.getInterceptor$asx(bounds);
       t2 = J.$sub$n(bounds._jsObject["width"], 30);
       this._buttonsContainerWidth = t2;
-      t3 = this.currentAnimation;
+      t3 = this._currentAnimation;
       t4 = t3._data;
       if (t4 != null)
         t4.set$buttonsContainerWidth(t2);
@@ -9278,272 +9403,309 @@ var $$ = {};
         t5 = t4.document.querySelector("#pomodoro_button_id");
         t6 = t4.document.querySelector("#long_button_id");
         t7 = t4.document.querySelector("#short_button_id");
-        t8 = t4.document.querySelector("#stop_button_id");
-        t9 = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-        this.animateNow$0().then$1(new K.ResizeAnimation(t4, t3, t2, t5, t6, t7, t8, t9, null, 0).get$drawFirstFrame());
+        t4 = t4.document.querySelector("#stop_button_id");
+        t8 = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
+        this.requestFirstAnimationFrame$0().then$1(new R.View__resizeWindow_closure(this, new K.ResizeAnimation(this, t3, t2, t5, t6, t7, t4, null, t8, null, 0)));
       }
       t2 = this._jsWindow;
       timerText = t2.document.querySelector("#timer_text_id");
       computedMarginTop = J.$tdiv$n(J.$sub$n(J.$sub$n(bounds._jsObject["height"], 160), timerText.clientHeight), 2);
       computedMarginBottom = J.$sub$n(J.$sub$n(J.$sub$n(bounds._jsObject["height"], 160), timerText.clientHeight), computedMarginTop);
-      C.Window_methods.get$animationFrame(t2).then$1(new R.View_resizeWindow_closure(timerText, computedMarginTop, computedMarginBottom));
-    }, "call$1", "get$resizeWindow", 2, 0, 219, 189, []],
-    animateNow$0: [function() {
-      var t1 = this.currentAnimation._data;
-      if (t1 == null)
-        return C.Window_methods.get$animationFrame(this._jsWindow);
-      else
-        return t1.stop$0(0).then$1(new R.View_animateNow_closure(this));
-    }, "call$0", "get$animateNow", 0, 0, null],
-    View$4: function(_app, _window, _jsWindow, alarm) {
-      var t1, t2, t3;
-      if (alarm != null) {
-        t1 = this._jsWindow;
-        J.set$display$x(t1.document.querySelector("#stop_button_id").style, "inline-block");
-        t2 = t1.document.querySelector("#pomodoro_button_id").style;
-        t3 = t1.document.querySelector("#short_button_id").style;
-        J.set$display$x(t1.document.querySelector("#long_button_id").style, "none");
-        J.set$display$x(t3, "none");
-        J.set$display$x(t2, "none");
-        t1.document.querySelector("#title_id").textContent = alarm.o.jsProxy._jsObject.name;
-        this.timerLoop$0();
-        $.get$storage().toString;
-        t1 = J.$index$asx(J.$index$asx($.get$chrome(), "storage"), "local");
-        t1 = t1 == null ? null : new N.LocalStorageArea(t1);
-        t1.set$1(H.fillLiteralMap(["wasRunningWhenClosed", true], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
-      }
-      this._getLocalStorage$0().then$1(new R.View_closure(this));
+      C.Window_methods.get$animationFrame(t2).then$1(new R.View__resizeWindow_closure0(timerText, computedMarginTop, computedMarginBottom));
+    }, "call$1", "get$_resizeWindow", 2, 0, 220, 189, []],
+    View$4: function(_app, _window, _jsWindow, viewIsReady) {
+      var t1, t2, t3, t4, bounds, element, t5, t6, collectionIterator, boundsIterator;
       t1 = this._app;
-      H.setRuntimeTypeInfo(new P._ControllerStream(t1._onRaise), [null]).listen$1(new R.View_closure0(this));
-      H.setRuntimeTypeInfo(new P._ControllerStream(t1._pomeranian_controller$_onAlarm), [null]).listen$1(new R.View_closure1(this));
-      t1 = this._jsWindow;
-      t2 = H.setRuntimeTypeInfo(new W._EventStream(t1, C.EventStreamProvider_resize._eventType, false), [null]);
-      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t2._html$_target, t2._eventType, W._wrapZone(this.get$resizeWindow()), t2._useCapture), [H.getTypeArgumentByIndex(t2, 0)])._tryResume$0();
-      t2 = H.setRuntimeTypeInfo(new W._EventStream(t1, C.EventStreamProvider_load._eventType, false), [null]);
-      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t2._html$_target, t2._eventType, W._wrapZone(this.get$resizeWindow()), t2._useCapture), [H.getTypeArgumentByIndex(t2, 0)])._tryResume$0();
-      R.View_absolutizeElements(W._FrozenElementList$_wrap(t1.document.querySelectorAll("#buttons_container_id button"), null));
-      t1.document.querySelector("#timer_text_id").textContent = "Stopped";
-      t2 = J.get$onClick$x(t1.document.querySelector("#pomodoro_button_id"));
-      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t2._html$_target, t2._eventType, W._wrapZone(this.clickAction$1(C.Button_0)), t2._useCapture), [H.getTypeArgumentByIndex(t2, 0)])._tryResume$0();
-      t2 = J.get$onClick$x(t1.document.querySelector("#long_button_id"));
-      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t2._html$_target, t2._eventType, W._wrapZone(this.clickAction$1(C.Button_2)), t2._useCapture), [H.getTypeArgumentByIndex(t2, 0)])._tryResume$0();
-      t2 = J.get$onClick$x(t1.document.querySelector("#short_button_id"));
-      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t2._html$_target, t2._eventType, W._wrapZone(this.clickAction$1(C.Button_1)), t2._useCapture), [H.getTypeArgumentByIndex(t2, 0)])._tryResume$0();
-      t2 = J.get$onClick$x(t1.document.querySelector("#stop_button_id"));
-      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t2._html$_target, t2._eventType, W._wrapZone(this.get$clickStop()), t2._useCapture), [H.getTypeArgumentByIndex(t2, 0)])._tryResume$0();
-      t1 = H.setRuntimeTypeInfo(new W._EventStream(t1, C.EventStreamProvider_keypress._eventType, false), [null]);
-      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._html$_target, t1._eventType, W._wrapZone(new R.View_closure2(this)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+      t2 = this._jsWindow;
+      if (t1.alarmTimeout != null) {
+        J.set$display$x(t2.document.querySelector("#stop_button_id").style, "inline-block");
+        t3 = t2.document.querySelector("#pomodoro_button_id").style;
+        t4 = t2.document.querySelector("#short_button_id").style;
+        J.set$display$x(t2.document.querySelector("#long_button_id").style, "none");
+        J.set$display$x(t4, "none");
+        J.set$display$x(t3, "none");
+        t2.document.querySelector("#title_id").textContent = t1.alarmName;
+        this._timerLoop$0();
+      } else
+        t2.document.querySelector("#timer_text_id").textContent = "Stopped";
+      this._highlightNextButton$0();
+      H.setRuntimeTypeInfo(new P._ControllerStream(t1._onRaise), [null]).listen$1(new R.View_closure(this));
+      H.setRuntimeTypeInfo(new P._ControllerStream(t1._onAlarm), [null]).listen$1(new R.View_closure0(this));
+      t1 = H.setRuntimeTypeInfo(new W._EventStream(t2, C.EventStreamProvider_resize._eventType, false), [null]);
+      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(this.get$_resizeWindow()), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+      if (viewIsReady)
+        this._resizeWindow$1(null);
+      else {
+        t1 = H.setRuntimeTypeInfo(new W._EventStream(t2, C.EventStreamProvider_load._eventType, false), [null]);
+        H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(this.get$_resizeWindow()), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+      }
+      bounds = [];
+      for (t1 = W._FrozenElementList$_wrap(t2.document.querySelectorAll("#buttons_container_id button"), null), t1 = t1.get$iterator(t1); t1.moveNext$0();) {
+        element = t1._current;
+        t3 = J.getInterceptor$x(element);
+        t4 = t3.get$offsetLeft(element);
+        t5 = t3.get$offsetWidth(element);
+        t6 = t3.get$offsetTop(element);
+        bounds.push(R.Bounds_Bounds(null, t3.get$offsetHeight(element), t4, null, t6, t5));
+      }
+      t1 = W._FrozenElementList$_wrap(t2.document.querySelectorAll("#buttons_container_id button"), null);
+      collectionIterator = t1.get$iterator(t1);
+      boundsIterator = new H.ListIterator(bounds, bounds.length, 0, null);
+      for (; collectionIterator.moveNext$0();) {
+        boundsIterator.moveNext$0();
+        if (J.get$display$x(J.get$style$x(collectionIterator._current)) === "none")
+          continue;
+        J.set$position$x(J.get$style$x(collectionIterator._current), "absolute");
+        J.set$width$x(J.get$style$x(collectionIterator._current), J.$add$ns(J.toString$0(J.get$width$x(boundsIterator._current)), "px"));
+        J.set$height$x(J.get$style$x(collectionIterator._current), J.$add$ns(J.toString$0(J.get$height$x(boundsIterator._current)), "px"));
+        J.set$left$x(J.get$style$x(collectionIterator._current), J.$add$ns(J.toString$0(J.get$left$x(boundsIterator._current)), "px"));
+        J.set$top$x(J.get$style$x(collectionIterator._current), J.$add$ns(J.toString$0(J.get$top$x(boundsIterator._current)), "px"));
+      }
+      t1 = J.get$onClick$x(t2.document.querySelector("#pomodoro_button_id"));
+      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(this._clickActionButton$1(C.Button_0)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+      t1 = J.get$onClick$x(t2.document.querySelector("#long_button_id"));
+      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(this._clickActionButton$1(C.Button_2)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+      t1 = J.get$onClick$x(t2.document.querySelector("#short_button_id"));
+      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(this._clickActionButton$1(C.Button_1)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+      t1 = J.get$onClick$x(t2.document.querySelector("#stop_button_id"));
+      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(this.get$_clickStop()), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+      t2 = H.setRuntimeTypeInfo(new W._EventStream(t2, C.EventStreamProvider_keypress._eventType, false), [null]);
+      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t2._target, t2._eventType, W._wrapZone(new R.View_closure1(this)), t2._useCapture), [H.getTypeArgumentByIndex(t2, 0)])._tryResume$0();
     },
-    static: {View$: function(_app, _window, _jsWindow, alarm) {
-        var t1 = new R.View(_window, _jsWindow, _app, C.Button_0, 530, 0, C.Button_0, "#pomodoro_button_id", null, null, new K.Pointer(null, P.StreamController_StreamController$broadcast(null, null, false, null)), 0);
-        t1.View$4(_app, _window, _jsWindow, alarm);
+    static: {View$: function(_app, _window, _jsWindow, viewIsReady) {
+        var t1 = new R.View(_window, _jsWindow, _app, C.Button_0, C.Button_0, 530, "#pomodoro_button_id", null, null, 0, new K.Pointer(null, P.StreamController_StreamController$broadcast(null, null, false, null)), null);
+        t1.View$4(_app, _window, _jsWindow, viewIsReady);
         return t1;
-      }, View_absolutizeElements: [function(collection) {
-        var bounds, t1, element, t2, t3, t4, t5, collectionIterator, boundsIterator;
-        bounds = [];
-        for (t1 = collection.get$iterator(collection); t1.moveNext$0();) {
-          element = t1._current;
-          t2 = J.getInterceptor$x(element);
-          t3 = t2.get$offsetLeft(element);
-          t4 = t2.get$offsetWidth(element);
-          t5 = t2.get$offsetTop(element);
-          bounds.push(R.Bounds_Bounds(null, t2.get$offsetHeight(element), t3, null, t5, t4));
-        }
-        collectionIterator = collection.get$iterator(collection);
-        boundsIterator = new H.ListIterator(bounds, bounds.length, 0, null);
-        for (; collectionIterator.moveNext$0();) {
-          boundsIterator.moveNext$0();
-          if (J.get$display$x(J.get$style$x(collectionIterator._current)) === "none")
-            continue;
-          J.set$position$x(J.get$style$x(collectionIterator._current), "absolute");
-          J.set$width$x(J.get$style$x(collectionIterator._current), J.$add$ns(J.toString$0(J.get$width$x(boundsIterator._current)), "px"));
-          J.set$height$x(J.get$style$x(collectionIterator._current), J.$add$ns(J.toString$0(J.get$height$x(boundsIterator._current)), "px"));
-          J.set$left$x(J.get$style$x(collectionIterator._current), J.$add$ns(J.toString$0(J.get$left$x(boundsIterator._current)), "px"));
-          J.set$top$x(J.get$style$x(collectionIterator._current), J.$add$ns(J.toString$0(J.get$top$x(boundsIterator._current)), "px"));
-        }
-      }, "call$1", "View_absolutizeElements$closure", 2, 0, null, 141, []]}
+      }}
   },
-  View__getLocalStorage_closure: {
+  View_requestFirstAnimationFrame_closure: {
     "^": "Closure:82;this_0",
-    call$1: [function(map) {
-      var t1 = J.getInterceptor$asx(map);
-      this.this_0._lastActionSync = t1.$index(map, "lastAction");
-      return t1.$index(map, "wasRunningWhenClosed");
-    }, "call$1", null, 2, 0, null, 161, [], "call"],
+    call$1: [function(innerTime) {
+      var t1, t2, t3;
+      t1 = this.this_0._jsWindow;
+      t2 = new T.WindowAnimationFrame(t1, P.StreamController_StreamController(null, null, null, null, true, null), P.StreamController_StreamController(null, null, null, null, true, null), null, false);
+      t3 = t2.get$callback();
+      C.Window_methods._ensureRequestAnimationFrame$0(t1);
+      t2._id = C.Window_methods._requestAnimationFrame$1(t1, W._wrapZone(t3));
+      return t2;
+    }, "call$1", null, 2, 0, null, 221, [], "call"],
     $isFunction: true
   },
-  View_timerLoopAnimationFrame_closure: {
-    "^": "Closure:82;this_0,completer_1",
-    call$1: [function(time) {
-      var t1;
-      this.this_0._timerLoopFrame = null;
-      t1 = this.completer_1.future;
-      if (t1._state !== 0)
-        H.throwExpression(new P.StateError("Future already completed"));
-      t1._complete$1(time);
-    }, "call$1", null, 2, 0, null, 169, [], "call"],
+  View__timerLoopAnimationFrame_closure: {
+    "^": "Closure:82;this_0",
+    call$1: [function(_) {
+      this.this_0.__timerLoopAnimationFrame = null;
+    }, "call$1", null, 2, 0, null, 183, [], "call"],
     $isFunction: true
   },
   View_closure: {
     "^": "Closure:82;this_0",
     call$1: [function(_) {
-      this.this_0.highlightNextButton$0();
+      this.this_0._pomeranian_view$_window.jsProxy.callMethod$1("focus");
+      return;
     }, "call$1", null, 2, 0, null, 183, [], "call"],
     $isFunction: true
   },
   View_closure0: {
     "^": "Closure:82;this_1",
     call$1: [function(_) {
-      this.this_1._pomeranian_view$_window.jsProxy.callMethod$1("focus");
-      return;
+      return this.this_1._animateToStopState$0();
     }, "call$1", null, 2, 0, null, 183, [], "call"],
     $isFunction: true
   },
   View_closure1: {
-    "^": "Closure:82;this_2",
-    call$1: [function(_) {
-      return this.this_2.toStopState$0();
-    }, "call$1", null, 2, 0, null, 183, [], "call"],
-    $isFunction: true
-  },
-  View_closure2: {
-    "^": "Closure:221;this_3",
+    "^": "Closure:223;this_2",
     call$1: [function(keyEvent) {
       var t1 = J.getInterceptor$x(keyEvent);
       if (t1.get$keyCode(keyEvent) !== 13)
         return;
       t1.preventDefault$0(keyEvent);
       t1.stopPropagation$0(keyEvent);
-      t1 = this.this_3;
-      if (t1._app.timeout == null)
-        t1.clickAction$1(t1.get$nextButton()).call$1(keyEvent);
+      t1 = this.this_2;
+      if (t1._app.alarmTimeout == null)
+        t1._clickActionButton$1(t1.get$_nextButton()).call$1(keyEvent);
       else
-        t1.clickStop$1(keyEvent);
-    }, "call$1", null, 2, 0, null, 220, [], "call"],
+        t1._clickStop$1(keyEvent);
+    }, "call$1", null, 2, 0, null, 222, [], "call"],
     $isFunction: true
   },
-  View_clickAction_closure: {
-    "^": "Closure:222;this_0,button_1",
+  View__clickActionButton_closure: {
+    "^": "Closure:224;this_1,button_2",
     call$1: [function($event) {
-      var t1, t2, t3, t4, t5, t6, t7, nextAnimation, delayInMinutes, eventName;
-      J.preventDefault$0$x($event);
-      t1 = this.this_0;
-      t2 = t1.currentAnimation;
-      t3 = t2._data;
-      if (t3 != null) {
-        t4 = J.getInterceptor(t3);
-        t4 = typeof t3 === "object" && t3 !== null && !!t4.$isTransitionButtonsAnimation;
+      var t1, t2, t3, t4, t5, t6, t7, t8, delayInMinutes, eventName, ms;
+      t1 = {};
+      t2 = J.getInterceptor$x($event);
+      t2.preventDefault$0($event);
+      t1.nextAnimation_0 = null;
+      t3 = this.this_1;
+      t4 = t3._currentAnimation;
+      t5 = t4._data;
+      if (t5 != null) {
+        t6 = J.getInterceptor(t5);
+        t6 = typeof t5 === "object" && t5 !== null && !!t6.$isTransitionButtonsAnimation;
       } else
-        t4 = false;
-      t5 = t1._jsWindow;
-      t6 = this.button_1;
-      t7 = t1._buttonsContainerWidth;
-      nextAnimation = t4 ? K.TransitionButtonsAnimation$(t5, t2, 400, t7, null, t6, true, new R.View_clickAction__closure(t3)) : K.TransitionButtonsAnimation$(t5, t2, 400, t7, null, t6, true, null);
-      t1._lastButton = t6;
-      t2 = t6.value;
-      if (t2 === t1.get$nextButton().value) {
-        t3 = J.$add$ns(t1._lastActionSync, 1);
-        t1._lastActionSync = t3;
-        t4 = $.get$storage();
-        t4.toString;
+        t6 = false;
+      t7 = t3._buttonsContainerWidth;
+      t8 = this.button_2;
+      if (t6)
+        t1.nextAnimation_0 = K.TransitionButtonsAnimation$(t3, t4, 400, t7, null, t8, true, new R.View__clickActionButton__closure(t5));
+      else
+        t1.nextAnimation_0 = K.TransitionButtonsAnimation$(t3, t4, 400, t7, null, t8, true, null);
+      t3.requestFirstAnimationFrame$0().then$1(new R.View__clickActionButton__closure0(t1, t3));
+      t3._lastButton = t8;
+      t1 = t8.value;
+      if (t1 === t3.get$_nextButton().value) {
+        t4 = t3._app;
+        t5 = J.$add$ns(t4._lastAction, 1);
+        t4._lastAction = t5;
+        t6 = $.get$storage();
+        t6.toString;
+        t7 = $.get$chrome();
+        t8 = J.$index$asx(J.$index$asx(t7, "storage"), "local");
+        t8 = t8 == null ? null : new N.LocalStorageArea(t8);
+        t8.set$1(H.fillLiteralMap(["lastAction", t5], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
+        t5 = t6;
+        t6 = t7;
+      } else if (t1 === C.Button_0.value) {
+        t4 = t3._app;
+        t4._lastAction = 1;
+        t5 = $.get$storage();
+        t5.toString;
         t6 = $.get$chrome();
         t7 = J.$index$asx(J.$index$asx(t6, "storage"), "local");
         t7 = t7 == null ? null : new N.LocalStorageArea(t7);
-        t7.set$1(H.fillLiteralMap(["lastAction", t3], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
-        t3 = t4;
-        t4 = t6;
-      } else if (t2 === C.Button_0.value) {
-        t1._lastActionSync = 1;
-        t3 = $.get$storage();
-        t3.toString;
-        t4 = $.get$chrome();
-        t6 = J.$index$asx(J.$index$asx(t4, "storage"), "local");
-        t6 = t6 == null ? null : new N.LocalStorageArea(t6);
-        t6.set$1(H.fillLiteralMap(["lastAction", 1], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
-      } else if (t2 === C.Button_1.value) {
-        t1._lastActionSync = 2;
-        t3 = $.get$storage();
-        t3.toString;
-        t4 = $.get$chrome();
-        t6 = J.$index$asx(J.$index$asx(t4, "storage"), "local");
-        t6 = t6 == null ? null : new N.LocalStorageArea(t6);
-        t6.set$1(H.fillLiteralMap(["lastAction", 2], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
+        t7.set$1(H.fillLiteralMap(["lastAction", 1], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
       } else {
-        t1._lastActionSync = 0;
-        t3 = $.get$storage();
-        t3.toString;
-        t4 = $.get$chrome();
-        t6 = J.$index$asx(J.$index$asx(t4, "storage"), "local");
-        t6 = t6 == null ? null : new N.LocalStorageArea(t6);
-        t6.set$1(H.fillLiteralMap(["lastAction", 0], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
+        t4 = t3._app;
+        if (t1 === C.Button_1.value) {
+          t4._lastAction = 2;
+          t5 = $.get$storage();
+          t5.toString;
+          t6 = $.get$chrome();
+          t7 = J.$index$asx(J.$index$asx(t6, "storage"), "local");
+          t7 = t7 == null ? null : new N.LocalStorageArea(t7);
+          t7.set$1(H.fillLiteralMap(["lastAction", 2], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
+        } else {
+          t4._lastAction = 0;
+          t5 = $.get$storage();
+          t5.toString;
+          t6 = $.get$chrome();
+          t7 = J.$index$asx(J.$index$asx(t6, "storage"), "local");
+          t7 = t7 == null ? null : new N.LocalStorageArea(t7);
+          t7.set$1(H.fillLiteralMap(["lastAction", 0], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
+        }
       }
       $.get$notifications().clear$1(0, "_pomerananianNotification");
-      t1.animateNow$0().then$1(nextAnimation.get$drawFirstFrame());
-      if (t2 === C.Button_0.value) {
+      if (t1 === C.Button_0.value) {
         delayInMinutes = 25;
         eventName = "Work";
-      } else if (t2 === C.Button_1.value) {
+      } else if (t1 === C.Button_1.value) {
         delayInMinutes = 5;
         eventName = "Short Break";
       } else {
         delayInMinutes = 15;
         eventName = "Long Break";
       }
-      t5.document.querySelector("#title_id").textContent = eventName;
-      t3.toString;
-      t2 = J.$index$asx(J.$index$asx(t4, "storage"), "local");
-      t2 = t2 == null ? null : new N.LocalStorageArea(t2);
-      t2.set$1(H.fillLiteralMap(["wasRunningWhenClosed", true], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
-      t2 = $.get$alarms();
-      t2.clearAll$0();
-      t3 = new L.AlarmCreateInfo(P.JsObject_JsObject(J.$index$asx($.get$context(), "Object"), null));
-      t3.AlarmCreateInfo$3$delayInMinutes$periodInMinutes$when(delayInMinutes, null, null);
-      if (J.$index$asx(t4, "alarms") == null)
-        t2._alarms0$_throwNotAvailable$0();
-      J.$index$asx(t4, "alarms").callMethod$2("create", [eventName, F.jsify(t3)]);
-      t2 = P.DateTime$_now();
-      t1._app.timeout = P.DateTime$fromMillisecondsSinceEpoch(t2.millisecondsSinceEpoch + C.JSNumber_methods._tdivFast$1(P.Duration$(0, 0, 0, 0, delayInMinutes, 0)._duration, 1000), t2.isUtc);
-      t1.timerLoop$0();
+      t3._jsWindow.document.querySelector("#title_id").textContent = eventName;
+      t1 = $.get$alarms();
+      t1.clearAll$0();
+      t7 = new L.AlarmCreateInfo(P.JsObject_JsObject(J.$index$asx($.get$context(), "Object"), null));
+      t7.AlarmCreateInfo$3$delayInMinutes$periodInMinutes$when(delayInMinutes, null, null);
+      if (J.$index$asx(t6, "alarms") == null)
+        t1._alarms0$_throwNotAvailable$0();
+      J.$index$asx(t6, "alarms").callMethod$2("create", [eventName, F.jsify(t7)]);
+      t1 = P.DateTime$fromMillisecondsSinceEpoch(t2.get$timeStamp($event), false);
+      ms = t1.millisecondsSinceEpoch;
+      t2 = C.JSNumber_methods._tdivFast$1(P.Duration$(0, 0, 0, 0, delayInMinutes, 0)._duration, 1000);
+      if (typeof ms !== "number")
+        return ms.$add();
+      t4.alarmTimeout = P.DateTime$fromMillisecondsSinceEpoch(ms + t2, t1.isUtc);
+      t4.alarmName = eventName;
+      t5.toString;
+      t6 = J.$index$asx(J.$index$asx(t6, "storage"), "local");
+      t1 = t6 == null ? null : new N.LocalStorageArea(t6);
+      t1.set$1(H.fillLiteralMap(["wasRunningWhenClosed", true], P.LinkedHashMap_LinkedHashMap(null, null, null, null, null)));
+      t3._timerLoop$0();
     }, "call$1", null, 2, 0, null, 189, [], "call"],
     $isFunction: true
   },
-  View_clickAction__closure: {
-    "^": "Closure:82;prevAnimation_2",
+  View__clickActionButton__closure: {
+    "^": "Closure:82;prevAnimation_3",
     call$1: [function(time) {
-      return 1 - this.prevAnimation_2.positionAtTime$1(time);
+      return 1 - this.prevAnimation_3.positionAtTime$1(time);
     }, "call$1", null, 2, 0, null, 169, [], "call"],
     $isFunction: true
   },
-  View_toStopState_closure: {
-    "^": "Closure:82;prevAnimation_0",
+  View__clickActionButton__closure0: {
+    "^": "Closure:82;box_0,this_4",
+    call$1: [function(firstFrame) {
+      var t1, t2, t3;
+      t1 = this.this_4._currentAnimation;
+      t2 = this.box_0;
+      t3 = t2.nextAnimation_0;
+      t1._data = t3;
+      t1 = t1._change;
+      if (t1._state >= 4)
+        H.throwExpression(t1._addEventError$0());
+      t1._sendData$1(t3);
+      firstFrame.get$onDraw().listen$1(t2.nextAnimation_0.get$drawFirstFrame());
+    }, "call$1", null, 2, 0, null, 225, [], "call"],
+    $isFunction: true
+  },
+  View__animateToStopState_closure: {
+    "^": "Closure:82;prevAnimation_1",
     call$1: [function(time) {
-      return 1 - this.prevAnimation_0.positionAtTime$1(time);
+      return 1 - this.prevAnimation_1.positionAtTime$1(time);
     }, "call$1", null, 2, 0, null, 169, [], "call"],
     $isFunction: true
   },
-  View_toStopState_closure0: {
-    "^": "Closure:82;this_1",
+  View__animateToStopState_closure0: {
+    "^": "Closure:82;box_0,this_2",
+    call$1: [function(firstFrame) {
+      var t1, t2, t3;
+      t1 = this.this_2._currentAnimation;
+      t2 = this.box_0;
+      t3 = t2.nextAnimation_0;
+      t1._data = t3;
+      t1 = t1._change;
+      if (t1._state >= 4)
+        H.throwExpression(t1._addEventError$0());
+      t1._sendData$1(t3);
+      firstFrame.get$onDraw().listen$1(t2.nextAnimation_0.get$drawFirstFrame());
+    }, "call$1", null, 2, 0, null, 225, [], "call"],
+    $isFunction: true
+  },
+  View__animateToStopState_closure1: {
+    "^": "Closure:82;this_3",
     call$1: [function(_) {
-      var t1 = this.this_1._jsWindow;
+      var t1 = this.this_3._jsWindow;
       t1.document.querySelector("#title_id").textContent = "Pomeranian";
       t1.document.querySelector("#timer_text_id").textContent = "Stopped";
     }, "call$1", null, 2, 0, null, 183, [], "call"],
     $isFunction: true
   },
-  View_resizeWindow_closure: {
-    "^": "Closure:82;timerText_0,computedMarginTop_1,computedMarginBottom_2",
-    call$1: [function(_) {
-      var t1 = this.timerText_0.style;
-      J.getInterceptor$x(t1).set$marginTop(t1, J.toString$0(this.computedMarginTop_1) + "px");
-      C.CssStyleDeclaration_methods.set$marginBottom(t1, J.toString$0(this.computedMarginBottom_2) + "px");
-    }, "call$1", null, 2, 0, null, 183, [], "call"],
+  View__resizeWindow_closure: {
+    "^": "Closure:82;this_0,nextAnimation_1",
+    call$1: [function(firstFrame) {
+      var t1, t2;
+      t1 = this.this_0._currentAnimation;
+      t2 = this.nextAnimation_1;
+      t1._data = t2;
+      t1 = t1._change;
+      if (t1._state >= 4)
+        H.throwExpression(t1._addEventError$0());
+      t1._sendData$1(t2);
+      firstFrame.get$onDraw().listen$1(t2.get$drawFirstFrame());
+    }, "call$1", null, 2, 0, null, 225, [], "call"],
     $isFunction: true
   },
-  View_animateNow_closure: {
-    "^": "Closure:82;this_0",
-    call$1: [function(innerTime) {
-      return C.Window_methods.get$animationFrame(this.this_0._jsWindow);
-    }, "call$1", null, 2, 0, null, 223, [], "call"],
+  View__resizeWindow_closure0: {
+    "^": "Closure:82;timerText_2,computedMarginTop_3,computedMarginBottom_4",
+    call$1: [function(_) {
+      var t1 = this.timerText_2.style;
+      J.getInterceptor$x(t1).set$marginTop(t1, J.toString$0(this.computedMarginTop_3) + "px");
+      C.CssStyleDeclaration_methods.set$marginBottom(t1, J.toString$0(this.computedMarginBottom_4) + "px");
+    }, "call$1", null, 2, 0, null, 183, [], "call"],
     $isFunction: true
   },
   Bounds: {
@@ -9577,15 +9739,31 @@ var $$ = {};
 ["pomeranian_window_animation", "pomeranian_window_animation.dart", , K, {
   "^": "",
   ViewAnimation: {
-    "^": "Animation;",
+    "^": "Animation;pointer<",
     get$middleButtonAdjust: function() {
       return J.$mod$n(J.$add$ns(J.$sub$n(this.get$buttonsContainerWidth(), 20), 1), 3) - 1;
-    }
+    },
+    stop$0: [function(_) {
+      return L.Animation.prototype.stop$0.call(this, this).then$1(new K.ViewAnimation_stop_closure(this));
+    }, "call$0", "get$stop", 0, 0, null]
+  },
+  ViewAnimation_stop_closure: {
+    "^": "Closure:82;this_0",
+    call$1: [function(time) {
+      var t1 = this.this_0.get$pointer();
+      t1._data = null;
+      t1 = t1._change;
+      if (t1._state >= 4)
+        H.throwExpression(t1._addEventError$0());
+      t1._sendData$1(null);
+      return time;
+    }, "call$1", null, 2, 0, null, 169, [], "call"],
+    $isFunction: true
   },
   ResizeAnimation: {
-    "^": "ViewAnimation;_pomeranian_window_animation$_jsWindow,_pointer,_pomeranian_window_animation$_buttonsContainerWidth,pomodoroButton,longButton,shortButton,stopButton,_animation$_completer,_requestedFrame,frameCount",
-    get$window: function(_) {
-      return this._pomeranian_window_animation$_jsWindow;
+    "^": "ViewAnimation;_view,pointer:pomeranian_window_animation$ResizeAnimation$pointer<,_pomeranian_window_animation$_buttonsContainerWidth,pomodoroButton,longButton,shortButton,stopButton,pointer,_animation$_completer,nextFrame,frameCount",
+    get$view: function(_) {
+      return this._view;
     },
     get$buttonsContainerWidth: function() {
       return this._pomeranian_window_animation$_buttonsContainerWidth;
@@ -9594,14 +9772,8 @@ var $$ = {};
       this._pomeranian_window_animation$_buttonsContainerWidth = value;
     },
     drawFirstFrame$1: [function(time) {
-      var t1, shortBreakButtonLeft, t2, t3;
-      t1 = this._pointer;
-      t1._data = this;
-      t1 = t1._change;
-      if (t1._state >= 4)
-        H.throwExpression(t1._addEventError$0());
-      t1._sendData$1(this);
-      J.set$width$x(this._pomeranian_window_animation$_jsWindow.document.querySelector("#buttons_container_id").style, J.toString$0(this._pomeranian_window_animation$_buttonsContainerWidth) + "px");
+      var shortBreakButtonLeft, t1, t2, t3;
+      J.set$width$x(this._view._jsWindow.document.querySelector("#buttons_container_id").style, J.toString$0(this._pomeranian_window_animation$_buttonsContainerWidth) + "px");
       shortBreakButtonLeft = J.$add$ns(J.$tdiv$n(J.$add$ns(J.$sub$n(this.get$buttonsContainerWidth(), 20), 1), 3), 10);
       t1 = J.$tdiv$n(J.$add$ns(J.$sub$n(this.get$buttonsContainerWidth(), 20), 1), 3);
       if (typeof t1 !== "number")
@@ -9622,7 +9794,7 @@ var $$ = {};
       this.redraw$1(time);
     }, "call$1", "get$drawFirstFrame", 2, 0, 168, 169, []],
     animateFrame$1: [function(time) {
-      var t1 = this._pointer;
+      var t1 = this.pomeranian_window_animation$ResizeAnimation$pointer;
       t1._data = null;
       t1 = t1._change;
       if (t1._state >= 4)
@@ -9635,7 +9807,7 @@ var $$ = {};
     }, "call$0", "get$stop", 0, 0, null]
   },
   TransitionButtonsAnimation: {
-    "^": "ViewAnimation;_pomeranian_window_animation$_jsWindow,pomodoroButton,longButton,shortButton,stopButton,_pointer,focusButton,isGoingToStop,animationDuration,_easingCurve,_startPosition,defaultButtonsContainerWidth,_animationStart,_animationEnd,_animation$_completer,_requestedFrame,frameCount",
+    "^": "ViewAnimation;_view,pomodoroButton,longButton,shortButton,stopButton,pointer:pomeranian_window_animation$TransitionButtonsAnimation$pointer<,focusButton,isGoingToStop,animationDuration,_easingCurve,_startPosition,defaultButtonsContainerWidth,_animationStart,_animationEnd,pointer,_animation$_completer,nextFrame,frameCount",
     _startPosition$1: function(arg0) {
       return this._startPosition.call$1(arg0);
     },
@@ -9645,8 +9817,8 @@ var $$ = {};
     set$buttonsContainerWidth: function(value) {
       this.defaultButtonsContainerWidth = value;
     },
-    get$window: function(_) {
-      return this._pomeranian_window_animation$_jsWindow;
+    get$view: function(_) {
+      return this._view;
     },
     get$middleButtonAdjust: function() {
       return J.$mod$n(J.$add$ns(J.$sub$n(this.defaultButtonsContainerWidth, 20), 1), 3) - 1;
@@ -9692,7 +9864,7 @@ var $$ = {};
         stopButtonWidth = longBreakButtonWidth;
         stopButtonLeft = longBreakButtonLeft;
       }
-      J.set$width$x(this._pomeranian_window_animation$_jsWindow.document.querySelector("#buttons_container_id").style, J.toString$0(this.defaultButtonsContainerWidth) + "px");
+      J.set$width$x(this._view._jsWindow.document.querySelector("#buttons_container_id").style, J.toString$0(this.defaultButtonsContainerWidth) + "px");
       t2 = this.pomodoroButton;
       J.set$width$x(t2.style, C.JSInt_methods.toString$0(pomodoroButtonWidth) + "px");
       t3 = this.longButton;
@@ -9709,7 +9881,7 @@ var $$ = {};
       J.set$left$x(t5.style, C.JSInt_methods.toString$0(stopButtonLeft) + "px");
       J.set$width$x(t5.style, J.toString$0(stopButtonWidth) + "px");
       if (finished) {
-        t6 = this._pointer;
+        t6 = this.pomeranian_window_animation$TransitionButtonsAnimation$pointer;
         t6._data = null;
         t6 = t6._change;
         if (t6._state >= 4)
@@ -9734,12 +9906,6 @@ var $$ = {};
       t2 = J.$sub$n(time, t1 * startPosition);
       this._animationStart = t2;
       this._animationEnd = J.$add$ns(t2, t1);
-      t1 = this._pointer;
-      t1._data = this;
-      t1 = t1._change;
-      if (t1._state >= 4)
-        H.throwExpression(t1._addEventError$0());
-      t1._sendData$1(this);
       if (this._animation$_completer.future._state !== 0)
         throw H.wrapException(new P.StateError("Each animation may only be run once."));
       if (this.isGoingToStop)
@@ -9757,13 +9923,14 @@ var $$ = {};
     $isTransitionButtonsAnimation: true,
     static: {"^": "TransitionButtonsAnimation__DEFAULT_ANIMATION_DURATION,TransitionButtonsAnimation__DEFAULT_EASING_CURVE", TransitionButtonsAnimation$: function($window, pointer, animationDuration, defaultButtonsContainerWidth, easingCurve, focusButton, isGoingToStop, startPosition) {
         var t1, t2, t3, t4, t5, t6;
-        t1 = $window.document.querySelector("#pomodoro_button_id");
-        t2 = $window.document.querySelector("#long_button_id");
-        t3 = $window.document.querySelector("#short_button_id");
-        t4 = $window.document.querySelector("#stop_button_id");
+        t1 = $window._jsWindow;
+        t2 = t1.document.querySelector("#pomodoro_button_id");
+        t3 = t1.document.querySelector("#long_button_id");
+        t4 = t1.document.querySelector("#short_button_id");
+        t1 = t1.document.querySelector("#stop_button_id");
         t5 = $.get$TransitionButtonsAnimation__DEFAULT_EASING_CURVE();
         t6 = startPosition == null ? new K.TransitionButtonsAnimation_closure() : startPosition;
-        return new K.TransitionButtonsAnimation($window, t1, t2, t3, t4, pointer, focusButton, isGoingToStop, animationDuration, t5, t6, defaultButtonsContainerWidth, null, null, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), null, 0);
+        return new K.TransitionButtonsAnimation($window, t2, t3, t4, t1, pointer, focusButton, isGoingToStop, animationDuration, t5, t6, defaultButtonsContainerWidth, null, null, null, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), null, 0);
       }}
   },
   TransitionButtonsAnimation_closure: {
@@ -9798,19 +9965,37 @@ $$ = null;
 
 // Runtime type support
 J.JSInt.$isint = true;
+J.JSInt.$isnum = true;
 J.JSInt.$isObject = true;
 J.JSDouble.$isdouble = true;
+J.JSDouble.$isnum = true;
 J.JSDouble.$isObject = true;
 W.Node.$isObject = true;
 J.JSString.$isString = true;
 J.JSString.$isObject = true;
+J.JSNumber.$isnum = true;
 J.JSNumber.$isObject = true;
 P.Duration.$isDuration = true;
 P.Duration.$isObject = true;
+P.Object.$isObject = true;
 L.Pair.$isObject = true;
 J.JSBool.$isbool = true;
 J.JSBool.$isObject = true;
-P.Object.$isObject = true;
+W.Event.$isEvent = true;
+W.Event.$isObject = true;
+P.Map.$isMap = true;
+P.Map.$isObject = true;
+P.Symbol.$isSymbol = true;
+P.Symbol.$isObject = true;
+N.StorageOnChangedEvent.$isStorageOnChangedEvent = true;
+N.StorageOnChangedEvent.$isObject = true;
+B.LaunchData.$isLaunchData = true;
+B.LaunchData.$isObject = true;
+W.KeyboardEvent.$isKeyboardEvent = true;
+W.KeyboardEvent.$isEvent = true;
+W.KeyboardEvent.$isObject = true;
+L.Alarm.$isAlarm = true;
+L.Alarm.$isObject = true;
 V.OnClosedEvent.$isOnClosedEvent = true;
 V.OnClosedEvent.$isObject = true;
 V.OnButtonClickedEvent.$isOnButtonClickedEvent = true;
@@ -9818,40 +10003,25 @@ V.OnButtonClickedEvent.$isObject = true;
 V.PermissionLevel.$isPermissionLevel = true;
 V.PermissionLevel.$isChromeEnum = true;
 V.PermissionLevel.$isObject = true;
-P.Symbol.$isSymbol = true;
-P.Symbol.$isObject = true;
-L.Alarm.$isAlarm = true;
-L.Alarm.$isObject = true;
-W.Event.$isEvent = true;
-W.Event.$isObject = true;
-W.KeyboardEvent.$isKeyboardEvent = true;
-W.KeyboardEvent.$isEvent = true;
-W.KeyboardEvent.$isObject = true;
-N.StorageOnChangedEvent.$isStorageOnChangedEvent = true;
-N.StorageOnChangedEvent.$isObject = true;
 W.MouseEvent.$isEvent = true;
 W.MouseEvent.$isObject = true;
-P.Map.$isMap = true;
-P.Map.$isObject = true;
-B.LaunchData.$isLaunchData = true;
-B.LaunchData.$isObject = true;
 H.RawReceivePortImpl.$isObject = true;
 H._IsolateEvent.$isObject = true;
 H._IsolateContext.$isObject = true;
-Z.ChromeEnum.$isChromeEnum = true;
-Z.ChromeEnum.$isObject = true;
 P.StackTrace.$isStackTrace = true;
 P.StackTrace.$isObject = true;
 P._BufferingStreamSubscription.$is_BufferingStreamSubscription = true;
 P._BufferingStreamSubscription.$is_EventSink = true;
 P._BufferingStreamSubscription.$isStreamSubscription = true;
 P._BufferingStreamSubscription.$isObject = true;
+Z.ChromeEnum.$isChromeEnum = true;
+Z.ChromeEnum.$isObject = true;
 P.JsObject.$isJsObject = true;
 P.JsObject.$isObject = true;
-P.Future.$isFuture = true;
-P.Future.$isObject = true;
 P._EventSink.$is_EventSink = true;
 P._EventSink.$isObject = true;
+P.Future.$isFuture = true;
+P.Future.$isObject = true;
 P.StreamSubscription.$isStreamSubscription = true;
 P.StreamSubscription.$isObject = true;
 P.Stream.$isStream = true;
@@ -9860,12 +10030,12 @@ P._DelayedEvent.$is_DelayedEvent = true;
 P._DelayedEvent.$isObject = true;
 P.DateTime.$isDateTime = true;
 P.DateTime.$isObject = true;
-P.EventSink.$isEventSink = true;
-P.EventSink.$isObject = true;
 L.Animation.$isAnimation = true;
 L.Animation.$isFuture = true;
 L.Animation.$asFuture = [[L.Pair, J.JSBool, J.JSDouble]];
 L.Animation.$isObject = true;
+T.AnimationFrame.$isAnimationFrame = true;
+T.AnimationFrame.$isObject = true;
 B.AppWindow.$isAppWindow = true;
 B.AppWindow.$isObject = true;
 $.$signature_args2 = {func: "args2", args: [null, null]};
@@ -10323,6 +10493,7 @@ $.Device__isIE = null;
 $.Device__isFirefox = null;
 $.Device__isWebKit = null;
 $.Device__cachedCssPrefix = null;
+$.viewIsReady = false;
 Isolate.$lazy($, "globalThis", "globalThis", "get$globalThis", function() {
   return function() { return this; }();
 });
@@ -10601,12 +10772,12 @@ init.metadata = ["object",
 {func: "Object__dynamic", ret: P.Object, args: [null]},
 "string",
 "pTerms",
-"collection",
 "priority",
 "listener",
 "useCapture",
 "length",
 "invocation",
+"collection",
 true,
 "growable",
 "fractionDigits",
@@ -10677,13 +10848,15 @@ true,
 "args",
 "alarm",
 "notification",
+{func: "AnimationFrame_", ret: T.AnimationFrame},
 "button",
 "clock",
 {func: "void__Event", void: true, args: [W.Event]},
+"innerTime",
 "keyEvent",
 {func: "dynamic__KeyboardEvent", args: [W.KeyboardEvent]},
 {func: "dynamic__Event", args: [W.Event]},
-"innerTime",
+"firstFrame",
 ];
 $ = null;
 Isolate = Isolate.$finishIsolateConstructor(Isolate);
@@ -11429,6 +11602,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Event.prototype = $desc;
+  Event.prototype.get$timeStamp = function(receiver) {
+    return receiver.timeStamp;
+  };
   function EventTarget() {
   }
   EventTarget.builtin$cls = "EventTarget";
@@ -13972,8 +14148,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _WorkerSendPort.prototype = $desc;
-  function RawReceivePortImpl(_id, _handler, _isClosed) {
-    this._id = _id;
+  function RawReceivePortImpl(__isolate_helper$_id, _handler, _isClosed) {
+    this.__isolate_helper$_id = __isolate_helper$_id;
     this._handler = _handler;
     this._isClosed = _isClosed;
   }
@@ -13984,8 +14160,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   RawReceivePortImpl.prototype = $desc;
-  RawReceivePortImpl.prototype.get$_id = function() {
-    return this._id;
+  RawReceivePortImpl.prototype.get$__isolate_helper$_id = function() {
+    return this.__isolate_helper$_id;
   };
   RawReceivePortImpl.prototype.get$_isClosed = function() {
     return this._isClosed;
@@ -14121,8 +14297,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   TimerImpl_internalCallback0.prototype = $desc;
-  function CapabilityImpl(_id) {
-    this._id = _id;
+  function CapabilityImpl(__isolate_helper$_id) {
+    this.__isolate_helper$_id = __isolate_helper$_id;
   }
   CapabilityImpl.builtin$cls = "CapabilityImpl";
   if (!"name" in CapabilityImpl)
@@ -14131,8 +14307,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   CapabilityImpl.prototype = $desc;
-  CapabilityImpl.prototype.get$_id = function() {
-    return this._id;
+  CapabilityImpl.prototype.get$__isolate_helper$_id = function() {
+    return this.__isolate_helper$_id;
   };
   function JSInvocationMirror(__js_helper$_memberName, _internalName, _kind, _arguments, _namedArgumentNames, _namedIndices) {
     this.__js_helper$_memberName = __js_helper$_memberName;
@@ -14335,9 +14511,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   TearOffClosure.prototype = $desc;
-  function BoundClosure(_self, _target, _receiver, __js_helper$_name) {
+  function BoundClosure(_self, __js_helper$_target, _receiver, __js_helper$_name) {
     this._self = _self;
-    this._target = _target;
+    this.__js_helper$_target = __js_helper$_target;
     this._receiver = _receiver;
     this.__js_helper$_name = __js_helper$_name;
   }
@@ -14460,8 +14636,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Pair.prototype = $desc;
-  function ChromeAlarms(_onAlarm) {
-    this._onAlarm = _onAlarm;
+  function ChromeAlarms(_alarms0$_onAlarm) {
+    this._alarms0$_onAlarm = _alarms0$_onAlarm;
   }
   ChromeAlarms.builtin$cls = "ChromeAlarms";
   if (!"name" in ChromeAlarms)
@@ -14570,9 +14746,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _AppWindow.prototype = $desc;
-  function ChromeAppWindow(_onBoundsChanged, _app0$_onClosed, _onFullscreened, _onMaximized, _onMinimized, _onRestored) {
+  function ChromeAppWindow(_onBoundsChanged, _onClosed, _onFullscreened, _onMaximized, _onMinimized, _onRestored) {
     this._onBoundsChanged = _onBoundsChanged;
-    this._app0$_onClosed = _app0$_onClosed;
+    this._onClosed = _onClosed;
     this._onFullscreened = _onFullscreened;
     this._onMaximized = _onMaximized;
     this._onMinimized = _onMinimized;
@@ -14597,8 +14773,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   AppWindow.prototype = $desc;
-  function ChromeNotifications(_onClosed, _onClicked, _onButtonClicked, _onPermissionLevelChanged) {
-    this._onClosed = _onClosed;
+  function ChromeNotifications(_notifications0$_onClosed, _onClicked, _onButtonClicked, _onPermissionLevelChanged) {
+    this._notifications0$_onClosed = _notifications0$_onClosed;
     this._onClicked = _onClicked;
     this._onButtonClicked = _onButtonClicked;
     this._onPermissionLevelChanged = _onPermissionLevelChanged;
@@ -14909,8 +15085,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   MappedIterator.prototype = $desc;
-  function MappedListIterable(__internal$_source, _f) {
-    this.__internal$_source = __internal$_source;
+  function MappedListIterable(_source, _f) {
+    this._source = _source;
     this._f = _f;
   }
   MappedListIterable.builtin$cls = "MappedListIterable";
@@ -15380,15 +15556,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   StreamSubscription.prototype = $desc;
-  function EventSink() {
-  }
-  EventSink.builtin$cls = "EventSink";
-  if (!"name" in EventSink)
-    EventSink.name = "EventSink";
-  $desc = $collectedClasses.EventSink;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EventSink.prototype = $desc;
   function _StreamController() {
   }
   _StreamController.builtin$cls = "_StreamController";
@@ -15718,9 +15885,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _ForwardingStreamSubscription.prototype = $desc;
-  function _MapStream(_transform, _source) {
+  function _MapStream(_transform, _async$_source) {
     this._transform = _transform;
-    this._source = _source;
+    this._async$_source = _async$_source;
   }
   _MapStream.builtin$cls = "_MapStream";
   if (!"name" in _MapStream)
@@ -16635,8 +16802,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   EventStreamProvider.prototype = $desc;
-  function _EventStream(_html$_target, _eventType, _useCapture) {
-    this._html$_target = _html$_target;
+  function _EventStream(_target, _eventType, _useCapture) {
+    this._target = _target;
     this._eventType = _eventType;
     this._useCapture = _useCapture;
   }
@@ -16647,8 +16814,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _EventStream.prototype = $desc;
-  function _ElementEventStreamImpl(_html$_target, _eventType, _useCapture) {
-    this._html$_target = _html$_target;
+  function _ElementEventStreamImpl(_target, _eventType, _useCapture) {
+    this._target = _target;
     this._eventType = _eventType;
     this._useCapture = _useCapture;
   }
@@ -16659,9 +16826,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _ElementEventStreamImpl.prototype = $desc;
-  function _EventStreamSubscription(_pauseCount, _html$_target, _eventType, _html$_onData, _useCapture) {
+  function _EventStreamSubscription(_pauseCount, _target, _eventType, _html$_onData, _useCapture) {
     this._pauseCount = _pauseCount;
-    this._html$_target = _html$_target;
+    this._target = _target;
     this._eventType = _eventType;
     this._html$_onData = _html$_onData;
     this._useCapture = _useCapture;
@@ -16695,8 +16862,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   FixedSizeListIterator.prototype = $desc;
-  function _DOMWindowCrossFrame(_window) {
-    this._window = _window;
+  function _DOMWindowCrossFrame(_html$_window) {
+    this._html$_window = _html$_window;
   }
   _DOMWindowCrossFrame.builtin$cls = "_DOMWindowCrossFrame";
   if (!"name" in _DOMWindowCrossFrame)
@@ -16911,6 +17078,29 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _BezierGen_addMatrix_closure.prototype = $desc;
+  function AnimationFrame() {
+  }
+  AnimationFrame.builtin$cls = "AnimationFrame";
+  if (!"name" in AnimationFrame)
+    AnimationFrame.name = "AnimationFrame";
+  $desc = $collectedClasses.AnimationFrame;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  AnimationFrame.prototype = $desc;
+  function WindowAnimationFrame(_window, _onDraw, _onExpire, _id, isCompleted) {
+    this._window = _window;
+    this._onDraw = _onDraw;
+    this._onExpire = _onExpire;
+    this._id = _id;
+    this.isCompleted = isCompleted;
+  }
+  WindowAnimationFrame.builtin$cls = "WindowAnimationFrame";
+  if (!"name" in WindowAnimationFrame)
+    WindowAnimationFrame.name = "WindowAnimationFrame";
+  $desc = $collectedClasses.WindowAnimationFrame;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  WindowAnimationFrame.prototype = $desc;
   function CssClassSetImpl() {
   }
   CssClassSetImpl.builtin$cls = "CssClassSetImpl";
@@ -16930,10 +17120,31 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   CssClassSetImpl_add_closure.prototype = $desc;
-  function Controller(_onRaise, _pomeranian_controller$_onAlarm, timeout) {
+  function main_closure() {
+  }
+  main_closure.builtin$cls = "main_closure";
+  if (!"name" in main_closure)
+    main_closure.name = "main_closure";
+  $desc = $collectedClasses.main_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  main_closure.prototype = $desc;
+  function main_closure0(controller_0) {
+    this.controller_0 = controller_0;
+  }
+  main_closure0.builtin$cls = "main_closure0";
+  if (!"name" in main_closure0)
+    main_closure0.name = "main_closure0";
+  $desc = $collectedClasses.main_closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  main_closure0.prototype = $desc;
+  function Controller(_onRaise, _onAlarm, alarmTimeout, alarmName, _lastAction) {
     this._onRaise = _onRaise;
-    this._pomeranian_controller$_onAlarm = _pomeranian_controller$_onAlarm;
-    this.timeout = timeout;
+    this._onAlarm = _onAlarm;
+    this.alarmTimeout = alarmTimeout;
+    this.alarmName = alarmName;
+    this._lastAction = _lastAction;
   }
   Controller.builtin$cls = "Controller";
   if (!"name" in Controller)
@@ -16962,19 +17173,29 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Controller_closure0.prototype = $desc;
-  function View(_pomeranian_view$_window, _jsWindow, _app, _focusButton, _buttonsContainerWidth, _lastActionSync, _lastButton, currentlyHighlighted, _timerLoopFrame, _redrawClockTimer, currentAnimation, previousTime) {
+  function Controller_syncLocalStorage_closure(this_0) {
+    this.this_0 = this_0;
+  }
+  Controller_syncLocalStorage_closure.builtin$cls = "Controller_syncLocalStorage_closure";
+  if (!"name" in Controller_syncLocalStorage_closure)
+    Controller_syncLocalStorage_closure.name = "Controller_syncLocalStorage_closure";
+  $desc = $collectedClasses.Controller_syncLocalStorage_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  Controller_syncLocalStorage_closure.prototype = $desc;
+  function View(_pomeranian_view$_window, _jsWindow, _app, _focusButton, _lastButton, _buttonsContainerWidth, _currentlyHighlightedButton, _timerLoopFrame, _redrawClockTimer, _previousTime, _currentAnimation, __timerLoopAnimationFrame) {
     this._pomeranian_view$_window = _pomeranian_view$_window;
     this._jsWindow = _jsWindow;
     this._app = _app;
     this._focusButton = _focusButton;
-    this._buttonsContainerWidth = _buttonsContainerWidth;
-    this._lastActionSync = _lastActionSync;
     this._lastButton = _lastButton;
-    this.currentlyHighlighted = currentlyHighlighted;
+    this._buttonsContainerWidth = _buttonsContainerWidth;
+    this._currentlyHighlightedButton = _currentlyHighlightedButton;
     this._timerLoopFrame = _timerLoopFrame;
     this._redrawClockTimer = _redrawClockTimer;
-    this.currentAnimation = currentAnimation;
-    this.previousTime = previousTime;
+    this._previousTime = _previousTime;
+    this._currentAnimation = _currentAnimation;
+    this.__timerLoopAnimationFrame = __timerLoopAnimationFrame;
   }
   View.builtin$cls = "View";
   if (!"name" in View)
@@ -16983,27 +17204,26 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   View.prototype = $desc;
-  function View__getLocalStorage_closure(this_0) {
+  function View_requestFirstAnimationFrame_closure(this_0) {
     this.this_0 = this_0;
   }
-  View__getLocalStorage_closure.builtin$cls = "View__getLocalStorage_closure";
-  if (!"name" in View__getLocalStorage_closure)
-    View__getLocalStorage_closure.name = "View__getLocalStorage_closure";
-  $desc = $collectedClasses.View__getLocalStorage_closure;
+  View_requestFirstAnimationFrame_closure.builtin$cls = "View_requestFirstAnimationFrame_closure";
+  if (!"name" in View_requestFirstAnimationFrame_closure)
+    View_requestFirstAnimationFrame_closure.name = "View_requestFirstAnimationFrame_closure";
+  $desc = $collectedClasses.View_requestFirstAnimationFrame_closure;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  View__getLocalStorage_closure.prototype = $desc;
-  function View_timerLoopAnimationFrame_closure(this_0, completer_1) {
+  View_requestFirstAnimationFrame_closure.prototype = $desc;
+  function View__timerLoopAnimationFrame_closure(this_0) {
     this.this_0 = this_0;
-    this.completer_1 = completer_1;
   }
-  View_timerLoopAnimationFrame_closure.builtin$cls = "View_timerLoopAnimationFrame_closure";
-  if (!"name" in View_timerLoopAnimationFrame_closure)
-    View_timerLoopAnimationFrame_closure.name = "View_timerLoopAnimationFrame_closure";
-  $desc = $collectedClasses.View_timerLoopAnimationFrame_closure;
+  View__timerLoopAnimationFrame_closure.builtin$cls = "View__timerLoopAnimationFrame_closure";
+  if (!"name" in View__timerLoopAnimationFrame_closure)
+    View__timerLoopAnimationFrame_closure.name = "View__timerLoopAnimationFrame_closure";
+  $desc = $collectedClasses.View__timerLoopAnimationFrame_closure;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  View_timerLoopAnimationFrame_closure.prototype = $desc;
+  View__timerLoopAnimationFrame_closure.prototype = $desc;
   function View_closure(this_0) {
     this.this_0 = this_0;
   }
@@ -17034,79 +17254,92 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   View_closure1.prototype = $desc;
-  function View_closure2(this_3) {
+  function View__clickActionButton_closure(this_1, button_2) {
+    this.this_1 = this_1;
+    this.button_2 = button_2;
+  }
+  View__clickActionButton_closure.builtin$cls = "View__clickActionButton_closure";
+  if (!"name" in View__clickActionButton_closure)
+    View__clickActionButton_closure.name = "View__clickActionButton_closure";
+  $desc = $collectedClasses.View__clickActionButton_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  View__clickActionButton_closure.prototype = $desc;
+  function View__clickActionButton__closure(prevAnimation_3) {
+    this.prevAnimation_3 = prevAnimation_3;
+  }
+  View__clickActionButton__closure.builtin$cls = "View__clickActionButton__closure";
+  if (!"name" in View__clickActionButton__closure)
+    View__clickActionButton__closure.name = "View__clickActionButton__closure";
+  $desc = $collectedClasses.View__clickActionButton__closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  View__clickActionButton__closure.prototype = $desc;
+  function View__clickActionButton__closure0(box_0, this_4) {
+    this.box_0 = box_0;
+    this.this_4 = this_4;
+  }
+  View__clickActionButton__closure0.builtin$cls = "View__clickActionButton__closure0";
+  if (!"name" in View__clickActionButton__closure0)
+    View__clickActionButton__closure0.name = "View__clickActionButton__closure0";
+  $desc = $collectedClasses.View__clickActionButton__closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  View__clickActionButton__closure0.prototype = $desc;
+  function View__animateToStopState_closure(prevAnimation_1) {
+    this.prevAnimation_1 = prevAnimation_1;
+  }
+  View__animateToStopState_closure.builtin$cls = "View__animateToStopState_closure";
+  if (!"name" in View__animateToStopState_closure)
+    View__animateToStopState_closure.name = "View__animateToStopState_closure";
+  $desc = $collectedClasses.View__animateToStopState_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  View__animateToStopState_closure.prototype = $desc;
+  function View__animateToStopState_closure0(box_0, this_2) {
+    this.box_0 = box_0;
+    this.this_2 = this_2;
+  }
+  View__animateToStopState_closure0.builtin$cls = "View__animateToStopState_closure0";
+  if (!"name" in View__animateToStopState_closure0)
+    View__animateToStopState_closure0.name = "View__animateToStopState_closure0";
+  $desc = $collectedClasses.View__animateToStopState_closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  View__animateToStopState_closure0.prototype = $desc;
+  function View__animateToStopState_closure1(this_3) {
     this.this_3 = this_3;
   }
-  View_closure2.builtin$cls = "View_closure2";
-  if (!"name" in View_closure2)
-    View_closure2.name = "View_closure2";
-  $desc = $collectedClasses.View_closure2;
+  View__animateToStopState_closure1.builtin$cls = "View__animateToStopState_closure1";
+  if (!"name" in View__animateToStopState_closure1)
+    View__animateToStopState_closure1.name = "View__animateToStopState_closure1";
+  $desc = $collectedClasses.View__animateToStopState_closure1;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  View_closure2.prototype = $desc;
-  function View_clickAction_closure(this_0, button_1) {
+  View__animateToStopState_closure1.prototype = $desc;
+  function View__resizeWindow_closure(this_0, nextAnimation_1) {
     this.this_0 = this_0;
-    this.button_1 = button_1;
+    this.nextAnimation_1 = nextAnimation_1;
   }
-  View_clickAction_closure.builtin$cls = "View_clickAction_closure";
-  if (!"name" in View_clickAction_closure)
-    View_clickAction_closure.name = "View_clickAction_closure";
-  $desc = $collectedClasses.View_clickAction_closure;
+  View__resizeWindow_closure.builtin$cls = "View__resizeWindow_closure";
+  if (!"name" in View__resizeWindow_closure)
+    View__resizeWindow_closure.name = "View__resizeWindow_closure";
+  $desc = $collectedClasses.View__resizeWindow_closure;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  View_clickAction_closure.prototype = $desc;
-  function View_clickAction__closure(prevAnimation_2) {
-    this.prevAnimation_2 = prevAnimation_2;
+  View__resizeWindow_closure.prototype = $desc;
+  function View__resizeWindow_closure0(timerText_2, computedMarginTop_3, computedMarginBottom_4) {
+    this.timerText_2 = timerText_2;
+    this.computedMarginTop_3 = computedMarginTop_3;
+    this.computedMarginBottom_4 = computedMarginBottom_4;
   }
-  View_clickAction__closure.builtin$cls = "View_clickAction__closure";
-  if (!"name" in View_clickAction__closure)
-    View_clickAction__closure.name = "View_clickAction__closure";
-  $desc = $collectedClasses.View_clickAction__closure;
+  View__resizeWindow_closure0.builtin$cls = "View__resizeWindow_closure0";
+  if (!"name" in View__resizeWindow_closure0)
+    View__resizeWindow_closure0.name = "View__resizeWindow_closure0";
+  $desc = $collectedClasses.View__resizeWindow_closure0;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  View_clickAction__closure.prototype = $desc;
-  function View_toStopState_closure(prevAnimation_0) {
-    this.prevAnimation_0 = prevAnimation_0;
-  }
-  View_toStopState_closure.builtin$cls = "View_toStopState_closure";
-  if (!"name" in View_toStopState_closure)
-    View_toStopState_closure.name = "View_toStopState_closure";
-  $desc = $collectedClasses.View_toStopState_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  View_toStopState_closure.prototype = $desc;
-  function View_toStopState_closure0(this_1) {
-    this.this_1 = this_1;
-  }
-  View_toStopState_closure0.builtin$cls = "View_toStopState_closure0";
-  if (!"name" in View_toStopState_closure0)
-    View_toStopState_closure0.name = "View_toStopState_closure0";
-  $desc = $collectedClasses.View_toStopState_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  View_toStopState_closure0.prototype = $desc;
-  function View_resizeWindow_closure(timerText_0, computedMarginTop_1, computedMarginBottom_2) {
-    this.timerText_0 = timerText_0;
-    this.computedMarginTop_1 = computedMarginTop_1;
-    this.computedMarginBottom_2 = computedMarginBottom_2;
-  }
-  View_resizeWindow_closure.builtin$cls = "View_resizeWindow_closure";
-  if (!"name" in View_resizeWindow_closure)
-    View_resizeWindow_closure.name = "View_resizeWindow_closure";
-  $desc = $collectedClasses.View_resizeWindow_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  View_resizeWindow_closure.prototype = $desc;
-  function View_animateNow_closure(this_0) {
-    this.this_0 = this_0;
-  }
-  View_animateNow_closure.builtin$cls = "View_animateNow_closure";
-  if (!"name" in View_animateNow_closure)
-    View_animateNow_closure.name = "View_animateNow_closure";
-  $desc = $collectedClasses.View_animateNow_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  View_animateNow_closure.prototype = $desc;
+  View__resizeWindow_closure0.prototype = $desc;
   function Bounds(left, top, width, height) {
     this.left = left;
     this.top = top;
@@ -17132,7 +17365,8 @@ function dart_precompiled($collectedClasses) {
   Bounds.prototype.get$height = function(receiver) {
     return this.height;
   };
-  function ViewAnimation() {
+  function ViewAnimation(pointer) {
+    this.pointer = pointer;
   }
   ViewAnimation.builtin$cls = "ViewAnimation";
   if (!"name" in ViewAnimation)
@@ -17141,16 +17375,30 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   ViewAnimation.prototype = $desc;
-  function ResizeAnimation(_pomeranian_window_animation$_jsWindow, _pointer, _pomeranian_window_animation$_buttonsContainerWidth, pomodoroButton, longButton, shortButton, stopButton, _animation$_completer, _requestedFrame, frameCount) {
-    this._pomeranian_window_animation$_jsWindow = _pomeranian_window_animation$_jsWindow;
-    this._pointer = _pointer;
+  ViewAnimation.prototype.get$pointer = function() {
+    return this.pointer;
+  };
+  function ViewAnimation_stop_closure(this_0) {
+    this.this_0 = this_0;
+  }
+  ViewAnimation_stop_closure.builtin$cls = "ViewAnimation_stop_closure";
+  if (!"name" in ViewAnimation_stop_closure)
+    ViewAnimation_stop_closure.name = "ViewAnimation_stop_closure";
+  $desc = $collectedClasses.ViewAnimation_stop_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  ViewAnimation_stop_closure.prototype = $desc;
+  function ResizeAnimation(_view, pomeranian_window_animation$ResizeAnimation$pointer, _pomeranian_window_animation$_buttonsContainerWidth, pomodoroButton, longButton, shortButton, stopButton, pointer, _animation$_completer, nextFrame, frameCount) {
+    this._view = _view;
+    this.pomeranian_window_animation$ResizeAnimation$pointer = pomeranian_window_animation$ResizeAnimation$pointer;
     this._pomeranian_window_animation$_buttonsContainerWidth = _pomeranian_window_animation$_buttonsContainerWidth;
     this.pomodoroButton = pomodoroButton;
     this.longButton = longButton;
     this.shortButton = shortButton;
     this.stopButton = stopButton;
+    this.pointer = pointer;
     this._animation$_completer = _animation$_completer;
-    this._requestedFrame = _requestedFrame;
+    this.nextFrame = nextFrame;
     this.frameCount = frameCount;
   }
   ResizeAnimation.builtin$cls = "ResizeAnimation";
@@ -17160,13 +17408,16 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   ResizeAnimation.prototype = $desc;
-  function TransitionButtonsAnimation(_pomeranian_window_animation$_jsWindow, pomodoroButton, longButton, shortButton, stopButton, _pointer, focusButton, isGoingToStop, animationDuration, _easingCurve, _startPosition, defaultButtonsContainerWidth, _animationStart, _animationEnd, _animation$_completer, _requestedFrame, frameCount) {
-    this._pomeranian_window_animation$_jsWindow = _pomeranian_window_animation$_jsWindow;
+  ResizeAnimation.prototype.get$pointer = function() {
+    return this.pomeranian_window_animation$ResizeAnimation$pointer;
+  };
+  function TransitionButtonsAnimation(_view, pomodoroButton, longButton, shortButton, stopButton, pomeranian_window_animation$TransitionButtonsAnimation$pointer, focusButton, isGoingToStop, animationDuration, _easingCurve, _startPosition, defaultButtonsContainerWidth, _animationStart, _animationEnd, pointer, _animation$_completer, nextFrame, frameCount) {
+    this._view = _view;
     this.pomodoroButton = pomodoroButton;
     this.longButton = longButton;
     this.shortButton = shortButton;
     this.stopButton = stopButton;
-    this._pointer = _pointer;
+    this.pomeranian_window_animation$TransitionButtonsAnimation$pointer = pomeranian_window_animation$TransitionButtonsAnimation$pointer;
     this.focusButton = focusButton;
     this.isGoingToStop = isGoingToStop;
     this.animationDuration = animationDuration;
@@ -17175,8 +17426,9 @@ function dart_precompiled($collectedClasses) {
     this.defaultButtonsContainerWidth = defaultButtonsContainerWidth;
     this._animationStart = _animationStart;
     this._animationEnd = _animationEnd;
+    this.pointer = pointer;
     this._animation$_completer = _animation$_completer;
-    this._requestedFrame = _requestedFrame;
+    this.nextFrame = nextFrame;
     this.frameCount = frameCount;
   }
   TransitionButtonsAnimation.builtin$cls = "TransitionButtonsAnimation";
@@ -17186,6 +17438,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   TransitionButtonsAnimation.prototype = $desc;
+  TransitionButtonsAnimation.prototype.get$pointer = function() {
+    return this.pomeranian_window_animation$TransitionButtonsAnimation$pointer;
+  };
   function TransitionButtonsAnimation_closure() {
   }
   TransitionButtonsAnimation_closure.builtin$cls = "TransitionButtonsAnimation_closure";
@@ -17229,5 +17484,5 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Button.prototype = $desc;
-  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, IFrameElement, ImageData, ImageElement, InputElement, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, Performance, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, _Attr, _DocumentType, _Entity, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, KeyRange, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedLength, AnimatedNumberList, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgDocument, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGAnimateColorElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, JSInvocationMirror, ReflectionInfo, Primitives_functionNoSuchMethod_closure, Primitives_applyFunction_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, CastErrorImplementation, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, initHooks_closure, initHooks_closure0, initHooks_closure1, Animation, Animation_stop_closure, Pair, ChromeAlarms, ChromeAlarms$__closure, Alarm, AlarmCreateInfo, ChromeApp, ChromeAppRuntime, ChromeAppRuntime$__closure, LaunchData, _ChromeAppWindow, _ChromeAppWindow$__closure, _AppWindow, ChromeAppWindow, AppWindow, ChromeNotifications, ChromeNotifications$__closure, OnClosedEvent, OnButtonClickedEvent, TemplateType, PermissionLevel, NotificationOptions, _createPermissionLevel_closure, ChromeCompleter, ChromeCompleter$noArgs_closure, ChromeCompleter$oneArg_closure, ChromeStreamController, ChromeStreamController$noArgs_closure, ChromeStreamController$oneArg_closure, ChromeStreamController$twoArgs_closure, ChromeObject, ChromeApi, ChromeEnum, Bounds0, ChromeStorage, ChromeStorage$__closure, StorageOnChangedEvent, LocalStorageArea, StorageArea, ListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, WhereIterable, WhereIterator, FixedLengthListMixin, Symbol0, _AsyncError, _BroadcastStream, _BroadcastSubscription, _BroadcastStreamController, _SyncBroadcastStreamController, _SyncBroadcastStreamController__sendData_closure, _SyncBroadcastStreamController__sendError_closure, _AsyncBroadcastStreamController, Future, _Completer, _AsyncCompleter, _SyncCompleter, _Future, _Future__addListener_closure, _Future__chainFutures_closure, _Future__chainFutures_closure0, _Future__asyncComplete_closure, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, StreamSubscription, EventSink, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _NoCallbacks, _NoCallbackAsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _NoCallbackSyncStreamController, _StreamController__SyncStreamControllerDispatch, _ControllerStream, _ControllerSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendError_sendError, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedError, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _ForwardingStream, _ForwardingStreamSubscription, _MapStream, _BaseZone, _BaseZone_bindCallback_closure, _BaseZone_bindCallback_closure0, _BaseZone_bindUnaryCallback_closure, _BaseZone_bindUnaryCallback_closure0, _rootHandleUncaughtError_closure, _rootHandleUncaughtError__closure, _RootZone, _HashMap, _HashMap_values_closure, _IdentityHashMap, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _HashSet, _IdentityHashSet, HashSetIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, _convertJsonToDart_closure, _convertJsonToDart_walk, Codec, Converter, JsonCodec, JsonDecoder, Function__toMangledNames_closure, NoSuchMethodError_toString_closure, DateTime, DateTime_toString_fourDigits, DateTime_toString_threeDigits, DateTime_toString_twoDigits, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, NoSuchMethodError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Iterator, Map, Null, Object, StackTrace, StringBuffer, Symbol, Interceptor_CssStyleDeclarationBase, _CssStyleDeclarationSet, Object_CssStyleDeclarationBase, _CssStyleDeclarationSet_closure, _CssStyleDeclarationSet_setProperty_closure, CssStyleDeclarationBase, _FrozenElementList, _FrozenElementList$_wrap_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Window_animationFrame_closure, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _ElementCssClassSet, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, _DOMWindowCrossFrame, _AttributeClassSet, Capability, JsObject, JsObject__convertDataTree__convert, JsFunction, JsArray, JsObject_ListMixin, _convertToJS_closure, _convertToJS_closure0, _wrapToDart_closure, _wrapToDart_closure0, _wrapToDart_closure1, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0, EasingCurve, _BezierGen, _BezierGen_addMatrix_closure, CssClassSetImpl, CssClassSetImpl_add_closure, Controller, Controller_closure, Controller_closure0, View, View__getLocalStorage_closure, View_timerLoopAnimationFrame_closure, View_closure, View_closure0, View_closure1, View_closure2, View_clickAction_closure, View_clickAction__closure, View_toStopState_closure, View_toStopState_closure0, View_resizeWindow_closure, View_animateNow_closure, Bounds, ViewAnimation, ResizeAnimation, TransitionButtonsAnimation, TransitionButtonsAnimation_closure, Pointer, Enum, Button];
+  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, IFrameElement, ImageData, ImageElement, InputElement, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, Performance, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, _Attr, _DocumentType, _Entity, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, KeyRange, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedLength, AnimatedNumberList, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgDocument, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGAnimateColorElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, JSInvocationMirror, ReflectionInfo, Primitives_functionNoSuchMethod_closure, Primitives_applyFunction_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, CastErrorImplementation, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, initHooks_closure, initHooks_closure0, initHooks_closure1, Animation, Animation_stop_closure, Pair, ChromeAlarms, ChromeAlarms$__closure, Alarm, AlarmCreateInfo, ChromeApp, ChromeAppRuntime, ChromeAppRuntime$__closure, LaunchData, _ChromeAppWindow, _ChromeAppWindow$__closure, _AppWindow, ChromeAppWindow, AppWindow, ChromeNotifications, ChromeNotifications$__closure, OnClosedEvent, OnButtonClickedEvent, TemplateType, PermissionLevel, NotificationOptions, _createPermissionLevel_closure, ChromeCompleter, ChromeCompleter$noArgs_closure, ChromeCompleter$oneArg_closure, ChromeStreamController, ChromeStreamController$noArgs_closure, ChromeStreamController$oneArg_closure, ChromeStreamController$twoArgs_closure, ChromeObject, ChromeApi, ChromeEnum, Bounds0, ChromeStorage, ChromeStorage$__closure, StorageOnChangedEvent, LocalStorageArea, StorageArea, ListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, WhereIterable, WhereIterator, FixedLengthListMixin, Symbol0, _AsyncError, _BroadcastStream, _BroadcastSubscription, _BroadcastStreamController, _SyncBroadcastStreamController, _SyncBroadcastStreamController__sendData_closure, _SyncBroadcastStreamController__sendError_closure, _AsyncBroadcastStreamController, Future, _Completer, _AsyncCompleter, _SyncCompleter, _Future, _Future__addListener_closure, _Future__chainFutures_closure, _Future__chainFutures_closure0, _Future__asyncComplete_closure, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, StreamSubscription, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _NoCallbacks, _NoCallbackAsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _NoCallbackSyncStreamController, _StreamController__SyncStreamControllerDispatch, _ControllerStream, _ControllerSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendError_sendError, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedError, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _ForwardingStream, _ForwardingStreamSubscription, _MapStream, _BaseZone, _BaseZone_bindCallback_closure, _BaseZone_bindCallback_closure0, _BaseZone_bindUnaryCallback_closure, _BaseZone_bindUnaryCallback_closure0, _rootHandleUncaughtError_closure, _rootHandleUncaughtError__closure, _RootZone, _HashMap, _HashMap_values_closure, _IdentityHashMap, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _HashSet, _IdentityHashSet, HashSetIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, _convertJsonToDart_closure, _convertJsonToDart_walk, Codec, Converter, JsonCodec, JsonDecoder, Function__toMangledNames_closure, NoSuchMethodError_toString_closure, DateTime, DateTime_toString_fourDigits, DateTime_toString_threeDigits, DateTime_toString_twoDigits, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, NoSuchMethodError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Iterator, Map, Null, Object, StackTrace, StringBuffer, Symbol, Interceptor_CssStyleDeclarationBase, _CssStyleDeclarationSet, Object_CssStyleDeclarationBase, _CssStyleDeclarationSet_closure, _CssStyleDeclarationSet_setProperty_closure, CssStyleDeclarationBase, _FrozenElementList, _FrozenElementList$_wrap_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Window_animationFrame_closure, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _ElementCssClassSet, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, _DOMWindowCrossFrame, _AttributeClassSet, Capability, JsObject, JsObject__convertDataTree__convert, JsFunction, JsArray, JsObject_ListMixin, _convertToJS_closure, _convertToJS_closure0, _wrapToDart_closure, _wrapToDart_closure0, _wrapToDart_closure1, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0, EasingCurve, _BezierGen, _BezierGen_addMatrix_closure, AnimationFrame, WindowAnimationFrame, CssClassSetImpl, CssClassSetImpl_add_closure, main_closure, main_closure0, Controller, Controller_closure, Controller_closure0, Controller_syncLocalStorage_closure, View, View_requestFirstAnimationFrame_closure, View__timerLoopAnimationFrame_closure, View_closure, View_closure0, View_closure1, View__clickActionButton_closure, View__clickActionButton__closure, View__clickActionButton__closure0, View__animateToStopState_closure, View__animateToStopState_closure0, View__animateToStopState_closure1, View__resizeWindow_closure, View__resizeWindow_closure0, Bounds, ViewAnimation, ViewAnimation_stop_closure, ResizeAnimation, TransitionButtonsAnimation, TransitionButtonsAnimation_closure, Pointer, Enum, Button];
 }
