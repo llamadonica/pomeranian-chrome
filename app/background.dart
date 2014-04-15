@@ -52,11 +52,11 @@ void onLaunch ([chrome.LaunchData launchData = null]) {
       String frame = 'chrome';
       chrome.WindowType type;
       switch (platformInfo['os']) {
-        case 'win':
-          type = chrome.WindowType.SHELL;
+        case 'cros':
+          type = chrome.WindowType.PANEL;
           break;
         default:
-          type = chrome.WindowType.PANEL;
+          type = chrome.WindowType.SHELL;
       }
       chrome.alarms.getAll().then((alarms) {
         chrome.Alarm notificationAlarm = null;

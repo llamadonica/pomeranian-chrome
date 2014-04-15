@@ -2853,11 +2853,11 @@ var $$ = {};
       var t1 = {};
       t1.type_1 = null;
       switch (J.$index$asx(platformInfo, "os")) {
-        case "win":
-          t1.type_1 = C.WindowType_shell;
+        case "cros":
+          t1.type_1 = C.WindowType_panel;
           break;
         default:
-          t1.type_1 = C.WindowType_panel;
+          t1.type_1 = C.WindowType_shell;
       }
       $.get$alarms().getAll$0().then$1(new S.onLaunch__closure(t1, "chrome"));
     }, "call$1", null, 2, 0, null, 166, [], "call"],
