@@ -1,6 +1,6 @@
 {
   "name": "Pomeranian",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "manifest_version": 2,
     
   "description": "A simple pomodoro timer for Chrome.",
@@ -13,13 +13,14 @@
   
   "app": {
     "background": {
-      "scripts": ["packages/browser/interop.js","background.dart.precompiled.js"],
+      "scripts": ["background.js"],
       "persistent": false
     }
   },
   
   "permissions": [
     "app.window",
+    "app.window.alwaysOnTop",
     "alarms",
     "notifications",
     "storage"

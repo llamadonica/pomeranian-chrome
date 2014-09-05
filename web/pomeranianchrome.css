@@ -18,13 +18,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@import url('//fonts.googleapis.com/css?family=RobotoDraft:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en');
+ 
 body {
   background-color: #F8F8F8;
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'RobotoDraft', sans-serif;
   font-size: 14px;
   font-weight: normal;
   line-height: 1.2em;
   margin: 15px;
+  overflow: hidden;
 }
 
 h1, p {
