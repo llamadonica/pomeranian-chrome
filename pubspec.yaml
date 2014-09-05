@@ -1,5 +1,7 @@
-name: pomeranianChrome
-description: A sample chrome packaged application
+name: pomeranian_chrome
+description: A sample Chrome packaged application
 dependencies:
   browser: any
   chrome: any
+transformers:
+- chrome
