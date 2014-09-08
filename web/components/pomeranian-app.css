@@ -1,0 +1,36 @@
+#title_id {
+  font-size: 24pt;
+  font-weight:bold;
+  margin-top: 0.67em;
+  margin-bottom: 0.67em;
+}
+
+body {
+  color: #333;
+}
+
+#timer_container_id {
+  position: relative;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  margin: 0.5em;
+  font-size: 24pt;
+}
+
+#button_bar {
+  margin-bottom: 1em;
+  min-height:30px;
+}
+.button_holder {
+  padding: 0 1.25em;
+}
+paper-button {
+  margin-left: 1em;
+}
+paper-button:first-child {
+  margin-left: 0;
+}
+paper-button[raisedButton] {
+  color: white;
+  background-color: #4285f4;
+}

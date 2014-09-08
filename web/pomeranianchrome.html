@@ -28,25 +28,11 @@
     <meta charset="utf-8">
     <title>PomeranianChrome</title>
     <link rel="stylesheet" href="pomeranianchrome.css">
+    <link rel="import" href="components/pomeranian-app.html">
+    <script type="application/dart">export 'package:polymer/init.dart';</script>
+    <script src="packages/browser/dart.js"></script>
   </head>
   <body>
-    <h1 id="title_id">Pomeranian</h1>
-
-    <div id="timer_container_id">
-      <p id="timer_text_id"></p>
-    </div>
-    <div id="buttons_container_id">
-      <form id="timer_buttons">
-        <button class="focused" id="pomodoro_button_id">Pomodoro</button>
-        <button id="short_button_id">Short&nbsp;Break</button>
-        <button id="long_button_id">Long&nbsp;Break</button>
-        <button id="stop_button_id" style="display: none;">Stop</button>
-      </form>
-    </div>
-    
-    <script src="packages/browser/interop.js"></script>
-    <script src="packages/chrome/bootstrap.js"></script>
-    <!--<script src="pomeranianchrome.dart" type="application/dart"></script>-->
-    <script src="pomeranianchrome.dart.precompiled.js"></script>
+    <pomeranian-app></pomeranian-app>
   </body>
 </html>
