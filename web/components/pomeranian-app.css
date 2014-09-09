@@ -11,7 +11,6 @@ body {
 
 #timer_container_id {
   position: relative;
-  border: 1px solid #ccc;
   background-color: #fff;
   margin: 0.5em;
   font-size: 24pt;
@@ -36,4 +35,14 @@ paper-button[raisedButton] {
 }
 paper-button#stop_button_id[raisedButton] {
   background-color: #f44242;
+}
+core-header-panel {
+  background: white;
+  /* height: 100% fails here on some browsers */
+  height: 100vh;
+  width: 100vw;
+}
+core-toolbar {
+  color: white;
+  background-color: #4285f4;
 }

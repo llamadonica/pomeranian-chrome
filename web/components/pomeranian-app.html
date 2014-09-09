@@ -1,42 +1,53 @@
 <link rel="import" href="packages/core_elements/core_animated_pages.html">
 <link rel="import" href="packages/core_elements/core_media_query.html">
+<link rel="import" href="packages/core_elements/core_header_panel.html">
+<link rel="import" href="packages/core_elements/core_toolbar.html">
+<link rel="import" href="packages/core_elements/core_icons.html">
 <link rel="import" href="packages/paper_elements/paper_button.html">
+<link rel="import" href="packages/paper_elements/paper_icon_button.html">
 <link rel="import" href="../transitions/slide-from-right.html">
 
 <polymer-element name="pomeranian-app">
   <template>
     <link rel="stylesheet" href="pomeranian-app.css">
-    <div vertical layout fit>
-      <div horizontal layout center-justified id="title_id">{{status}}</div>
-      <div vertical layout flex id="timer_container_id">
-        <div flex></div>
-        <div horizontal layout center-justified>
-          <p id="timer_text_id">{{timeRemaining}}</p>
+    <core-header-panel>
+      <core-toolbar id="mainheader">
+        <paper-icon-button id="navicon" 
+          icon="menu"></paper-icon-button>
+        <span flex>{{status}}</span>
+      </core-toolbar>
+      <div vertical layout fit>
+        <div vertical layout flex id="timer_container_id">
+          <paper-shadow z="1"></paper-shadow>
+          <div flex></div>
+          <div horizontal layout center-justified>
+            <p id="timer_text_id">{{timeRemaining}}</p>
+          </div>
+          <div flex></div>
         </div>
-        <div flex></div>
+        <div layout id="button_bar">
+          <core-animated-pages selected="{{selected}}" transitions="slide-from-right">
+            <section id="stopped">
+               <div class="button_holder" layout horizontal slide-from-right>
+                  <paper-button flex raisedButton class="focused" label="Pomodoro"
+                     id="pomodoro_button_id" on-tap="{{pomodoroButton}}">
+                  </paper-button>
+                  <paper-button flex raisedButton id="short_button_id"
+                     label="Short Break" on-tap="{{shortBreakButton}}"></paper-button>
+                  <paper-button flex raisedButton id="long_button_id"
+                     label="Long Break"  on-tap="{{longBreakButton}}"></paper-button>
+               </div>
+            </section>
+            <section id="active">
+              <div class="button_holder" layout horizontal slide-from-right>
+                <paper-button flex raisedButton id="stop_button_id" label="Stop"
+                    on-tap="{{stopButton}}"></paper-button>
+              </div>
+            </section>
+          </core-animated-pages>
+        </div>
       </div>
-    <div layout id="button_bar">
-      <core-animated-pages selected="{{selected}}" transitions="slide-from-right">
-      <section id="stopped">
-        <div class="button_holder" layout horizontal slide-from-right>
-          <paper-button flex raisedButton class="focused" label="Pomodoro"
-              id="pomodoro_button_id" on-tap="{{pomodoroButton}}">
-          </paper-button>
-          <paper-button flex raisedButton id="short_button_id"
-              label="Short Break" on-tap="{{shortBreakButton}}"></paper-button>
-          <paper-button flex raisedButton id="long_button_id"
-              label="Long Break"  on-tap="{{longBreakButton}}"></paper-button>
-        </div>
-      </section>
-      <section id="active">
-        <div class="button_holder" layout horizontal slide-from-right>
-        <paper-button flex raisedButton id="stop_button_id" label="Stop"
-             on-tap="{{stopButton}}"></paper-button>
-        </div>
-      </section>
-      </core-animated-pages>
-    </div>
-    </div>
+    </core-header-panel>
   </template>
   <script type="application/dart" src="pomeranian-app.dart"></script>
 </polymer-element>

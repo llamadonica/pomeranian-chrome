@@ -47,11 +47,10 @@ void onNotificationClicked (String notification) {
 }
 
 void onLaunch ([chrome.LaunchData launchData = null]) {
-    //DONE: Use chrome APIs to discover OS.
     chrome.runtime.getPlatformInfo().then((platformInfo) {
       String frame = 'chrome';
       chrome.WindowType type;
-      switch (platformInfo['os']) {
+      switch (platformInfo.os) {
         case 'cros':
           type = chrome.WindowType.PANEL;
           break;
@@ -70,8 +69,8 @@ void onLaunch ([chrome.LaunchData launchData = null]) {
               type:type,
               defaultWidth:560,
               defaultHeight:240,
-              minWidth: 400,
-              minHeight: 220,
+              minWidth: 422,
+              minHeight: 200,
               alwaysOnTop: true
               )).then((appWindow) {
                 windowIsActive = true;
