@@ -1,6 +1,7 @@
 <link rel="import" href="packages/core_elements/core_animated_pages.html">
 <link rel="import" href="packages/core_elements/core_media_query.html">
 <link rel="import" href="packages/paper_elements/paper_button.html">
+<link rel="import" href="../transitions/slide-from-right.html">
 
 <polymer-element name="pomeranian-app">
   <template>
@@ -15,18 +16,22 @@
         <div flex></div>
       </div>
     <div layout id="button_bar">
-      <core-animated-pages selected="{{selected}}" transitions="cross-fade-all">
+      <core-animated-pages selected="{{selected}}" transitions="slide-from-right">
       <section id="stopped">
         <div class="button_holder" layout horizontal slide-from-right>
-          <paper-button flex raisedButton class="focused" label="Pomodoro" id="pomodoro_button_id">
+          <paper-button flex raisedButton class="focused" label="Pomodoro"
+              id="pomodoro_button_id" on-tap="{{pomodoroButton}}">
           </paper-button>
-          <paper-button flex raisedButton id="short_button_id" label="Short Break"></paper-button>
-          <paper-button flex raisedButton id="long_button_id" label="Long Break"></paper-button>
+          <paper-button flex raisedButton id="short_button_id"
+              label="Short Break" on-tap="{{shortBreakButton}}"></paper-button>
+          <paper-button flex raisedButton id="long_button_id"
+              label="Long Break"  on-tap="{{longBreakButton}}"></paper-button>
         </div>
       </section>
       <section id="active">
         <div class="button_holder" layout horizontal slide-from-right>
-        <paper-button flex raisedButton id="stop_button_id" label="Stop"></paper-button>
+        <paper-button flex raisedButton id="stop_button_id" label="Stop"
+             on-tap="{{stopButton}}"></paper-button>
         </div>
       </section>
       </core-animated-pages>

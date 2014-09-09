@@ -25,6 +25,7 @@ body {
   font-weight: normal;
   line-height: 1.2em;
   margin: 15px;
+  overflow: hidden;
 }
 
 h1, p {

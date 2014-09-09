@@ -34,3 +34,6 @@ paper-button[raisedButton] {
   color: white;
   background-color: #4285f4;
 }
+paper-button#stop_button_id[raisedButton] {
+  background-color: #f44242;
+}
