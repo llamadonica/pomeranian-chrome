@@ -4,7 +4,9 @@
 <link rel="import" href="packages/core_elements/core_toolbar.html">
 <link rel="import" href="packages/core_elements/core_icons.html">
 <link rel="import" href="packages/paper_elements/paper_button.html">
-<link rel="import" href="packages/paper_elements/paper_icon_button.html">
+<link rel="import" href="packages/paper_elements/paper_menu_button.html">
+<link rel="import" href="packages/paper_elements/paper_item.html">
+<link rel="import" href="packages/paper_elements/paper_toggle_button.html">
 <link rel="import" href="../transitions/slide-from-right.html">
 
 <polymer-element name="pomeranian-app">
@@ -12,8 +14,17 @@
     <link rel="stylesheet" href="pomeranian-app.css">
     <core-header-panel>
       <core-toolbar id="mainheader">
-        <paper-icon-button id="navicon" 
-          icon="menu"></paper-icon-button>
+        <paper-menu-button icon="menu">
+          <div class="paper_group_header">When time is up:</div>
+          <div class="paper_group">
+            <paper-item label="Show a Notification" on-tap="{{toggleTryNotifications}}">
+              <paper-toggle-button id="try-notifications-toggle" 
+                  checked?="{{tryNotifications}}" 
+                  on-change="{{changeTryNotifications}}">
+              </paper-toggle-button>
+            </paper-item>
+          </div>
+        </paper-menu-button>
         <span flex>{{status}}</span>
       </core-toolbar>
       <div vertical layout fit>

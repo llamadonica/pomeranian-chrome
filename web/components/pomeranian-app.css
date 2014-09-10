@@ -14,6 +14,7 @@ body {
   background-color: #fff;
   margin: 0.5em;
   font-size: 24pt;
+  border-radius: 3px;
 }
 
 #button_bar {
@@ -45,4 +46,29 @@ core-header-panel {
 core-toolbar {
   color: white;
   background-color: #4285f4;
+}
+paper-item {
+  color: black;
+  padding: 0 16px;
+  font-size: 16px;
+}
+paper-item paper-toggle-button {
+  padding-left: 16px;
+}
+paper-toggle-button::shadow paper-radio-button::shadow #ink[checked] {
+  color: #4285f4;
+}
+paper-toggle-button::shadow paper-radio-button::shadow #onRadio,
+paper-toggle-button::shadow #toggleBar[checked] {
+  background-color: #4285f4;
+}
+.paper_group_header {
+  color: black;
+  padding: 6px 12px 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+.paper_group_header:not(:first-child) {
+  border-top: 1px solid #dddddd;
+  margin-top: 0;
 }

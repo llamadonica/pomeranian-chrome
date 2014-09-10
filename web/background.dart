@@ -24,7 +24,8 @@ import 'dart:html';
 import 'dart:async';
 import 'dart:js';
 import 'package:chrome/chrome_app.dart' as chrome;
-import 'pomeranian_notification_options.dart';
+
+import 'lib/app_services.dart';
 
 void main () {
   windowIsActive = false;
@@ -34,11 +35,8 @@ void main () {
 }
 
 void onAlarm (chrome.Alarm alarm) {
-  if (windowIsActive) return;
-  chrome.notifications.create(
-      "_pomerananianNotification",
-      PomeranianNotificationOptions.notificationOptions(alarm.name));
 }
+
 void onNotificationClicked (String notification) {
   if (windowIsActive) return;
   assert(notification == "_pomerananianNotification");
@@ -79,13 +77,11 @@ void onLaunch ([chrome.LaunchData launchData = null]) {
                 appWindow.jsProxy['alarm'] = notificationAlarm;
                 appWindow.onClosed.listen((_) {
                   windowIsActive = false;
+                
               });
             });
       });
     });
   }
 
-bool get windowIsActive => context['windowIsActive'];
-set windowIsActive (bool value) {
-  context['windowIsActive'] = value;
-}
+bool windowIsActive = false;
