@@ -80,12 +80,14 @@
 	   performLaunch();
 	 }
        }
+       chrome.notifications.clear(id, function(_) {;});
      }
    };
    var appDelegate = {
      alarm: null,
      storage: {},
      _tryNotifications: true,
+     _keepOnTop: 2,
      _isAuthorizedForNotifications: false,
      getIconSize: function() {return 128;},
      storeKey: function(key, value) {
@@ -107,6 +109,9 @@
      getHasStorageCapabilities: function() {
        return true;
      },
+     getHasAlwaysOnTopCapabilities: function() {
+       return true;
+     },
      getIsAuthorizedForNotifications: function() {
        return this._isAuthorizedForNotifications;
      },
@@ -124,6 +129,15 @@
      },
      setTryNotifications: function(value) {
        this._tryNotifications = value;
+     },
+     getKeepOnTop: function() {
+       return this._keepOnTop;
+     },
+     setKeepOnTop: function(value) {
+       this._keepOnTop = value;
+       var window = chrome.app.window.get('_mainWindow');
+       if (window)
+         window.setAlwaysOnTop(value > 0);
      },
      createNotification: function (title, options) {
        chrome.notifications.create(
@@ -168,6 +182,9 @@
   
   chrome.notifications.onClicked.addListener(allNotifications.handleClick);
 })();
+chrome.notifications.onClicked.addListener(function(id) {
+  chrome.notifications.clear(id, function(_) {;});
+});
 chrome.alarms.onAlarm.addListener(function (alarm) {
   if (alarm.name.indexOf('#') == 0) return;
   var message = (alarm.name == 'Sprint')?'Time for a break.':'Time to get back to work.';

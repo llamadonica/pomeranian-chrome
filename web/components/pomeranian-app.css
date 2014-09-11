@@ -59,8 +59,14 @@ paper-toggle-button::shadow paper-radio-button::shadow #ink[checked] {
   color: #4285f4;
 }
 paper-toggle-button::shadow paper-radio-button::shadow #onRadio,
-paper-toggle-button::shadow #toggleBar[checked] {
+paper-toggle-button::shadow #toggleBar[checked],
+paper-tristate-toggle-button::shadow paper-tristate-radio-button::shadow #onRadio,
+paper-tristate-toggle-button::shadow #toggleBar[status="2"] {
   background-color: #4285f4;
+}
+paper-tristate-toggle-button::shadow paper-tristate-radio-button::shadow #midRadio,
+paper-tristate-toggle-button::shadow #toggleBar[status="1"] {
+  background-color: #f44242;
 }
 .paper_group_header {
   color: black;
@@ -71,4 +77,9 @@ paper-toggle-button::shadow #toggleBar[checked] {
 .paper_group_header:not(:first-child) {
   border-top: 1px solid #dddddd;
   margin-top: 0;
+}
+.keep_on_top_description {
+  color: #808080;
+  padding-left: 8px;
+  min-width: 114px;
 }

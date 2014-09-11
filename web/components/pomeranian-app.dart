@@ -6,9 +6,10 @@ import 'package:paper_elements/paper_toggle_button.dart';
 
 import '../lib/app_services.dart';
 import '../lib/notification_patch.dart';
+import 'paper-tristate-toggle-button.dart';
 
 @CustomTag('pomeranian-app')
-class PomeranianApp extends PolymerElement {
+class PomeranianApp extends PolymerElement with Observable {
   static const String APP_NAME = "pomeranian_chrome";
   
   @observable int selected;
@@ -33,10 +34,39 @@ class PomeranianApp extends PolymerElement {
   }
   AppDelegate __appDelegate = null;
   
-  bool get tryNotifications => _appDelegate.tryNotifications;
-  void set tryNotifications(bool value) {
-    _appDelegate.tryNotifications = value;
+  @observable bool tryNotifications = true;
+  void tryNotificationsChanged(bool oldValue) {
+    _appDelegate.tryNotifications = tryNotifications;
+    if (_appDelegate.hasStorageCapabilities)
+      _appDelegate.storeKey(
+          "$APP_NAME.notifications",
+          tryNotifications.toString());
   }
+  
+  @observable int keepOnTop;
+  void keepOnTopChanged(int oldValue) {
+    switch (keepOnTop) {
+      case 1:
+        _appDelegate.keepOnTop = (expires == null);
+        break;
+      case 2:
+        _appDelegate.keepOnTop = true;
+        break;
+      default:
+        _appDelegate.keepOnTop = false;
+        break;
+    }
+    if (_appDelegate.hasStorageCapabilities)
+      _appDelegate.storeKey(
+        "$APP_NAME.alwaysOnTop",
+        keepOnTop.toString());
+  }
+  @ComputedProperty("(keepOnTop == 0)?'Never':((keepOnTop == 1)?'When Stopped':'Always')")
+  String get keepOnTopDescription => readValue(#keepOnTopDescription);
+  
+  
+  bool get hasAlwaysOnTopCapabilities =>
+    _appDelegate.hasAlwaysOnTopCapabilities;
   
   bool canDoNotifications = false;
   bool get isAuthorizedForNotifications => 
@@ -47,7 +77,16 @@ class PomeranianApp extends PolymerElement {
     if (_appDelegate.hasStorageCapabilities) {
       var enableNotifications = _appDelegate.getKey("$APP_NAME.notifications");
       if (enableNotifications != null) {
-        tryNotifications = (enableNotifications == "true");
+        _appDelegate.tryNotifications = tryNotifications = (enableNotifications == "true");
+      }
+      if (_appDelegate.hasAlwaysOnTopCapabilities) {
+        var enableAlwaysOnTop = _appDelegate.getKey("$APP_NAME.alwaysOnTop");
+        if (enableAlwaysOnTop != null) {
+          keepOnTop = 
+              (enableAlwaysOnTop == null || enableAlwaysOnTop == "true")?2:
+                (enableAlwaysOnTop == "false"?0:
+                  int.parse(enableAlwaysOnTop,onError: (_) => 0));
+        }
       }
     }
   }
@@ -81,6 +120,8 @@ class PomeranianApp extends PolymerElement {
       timeRemaining = "$minute:${seconds.toString().padLeft(2,'0')}";
       status = title;
       selected = 1;
+      if (keepOnTop == 1)
+        _appDelegate.keepOnTop = false;
       
       expires = __appDelegate.alarm;
       //_appDelegate.postAlarm(expires, status);
@@ -123,6 +164,8 @@ class PomeranianApp extends PolymerElement {
     timeRemaining = "Stopped";
     status = "Pomeranian";
     selected = 0;
+    if (keepOnTop == 1)
+      _appDelegate.keepOnTop = true;
   }
   void setTimer(int timeInMinutes, String title, Event ev) {
     if (((ev.target as Node)
@@ -149,6 +192,8 @@ class PomeranianApp extends PolymerElement {
     timeRemaining = "$timeInMinutes:00";
     status = title;
     selected = 1;
+    if (keepOnTop == 1)
+      _appDelegate.keepOnTop = false;
     
     expires = new DateTime.now().add(duration);
     _appDelegate.postAlarm(expires, status);
@@ -170,20 +215,25 @@ class PomeranianApp extends PolymerElement {
   }
   void changeTryNotifications(Event ev) {
     tryNotifications = ($['try-notifications-toggle'] as PaperToggleButton).checked;
+  }
+  void toggleTryNotifications(Event ev) {
+    PaperToggleButton toggleButton = $['try-notifications-toggle'];
+    if (ev.target == toggleButton) ev.stopPropagation();
+    
+    tryNotifications = !tryNotifications;
     if (tryNotifications && !isAuthorizedForNotifications)
       _appDelegate.authorizeForNotification().then((result) {
         canDoNotifications = result;
       });
-    if (_appDelegate.hasStorageCapabilities)
-      _appDelegate.storeKey(
-          "$APP_NAME.notifications",
-          tryNotifications.toString());
   }
-  void toggleTryNotifications(Event ev) {
-    PaperToggleButton toggleButton = $['try-notifications-toggle'];
-    if (ev.target == toggleButton) return;
-    toggleButton.checked = !toggleButton.checked;
-    changeTryNotifications(ev);
+  void changeKeepOnTop(Event ev) {
+    keepOnTop = ($['keep-on-top-toggle'] as PaperTristateToggleButton).state;
+  }
+  void toggleKeepOnTop(Event ev) {
+    PaperTristateToggleButton toggleButton = $['keep-on-top-toggle'];
+    if (ev.target == toggleButton) ev.stopPropagation();
+    
+    toggleButton.state = (toggleButton.state + 1) % 3;
   }
 }
 
@@ -261,6 +311,18 @@ class _HTML5AppDelegate extends AppDelegate {
   }
   
   @override String get status => '';
+
+  // TODO: implement hasAlwaysOnTopCapabilities
+  @override
+  bool get hasAlwaysOnTopCapabilities => 
+      false;
+
+  @override
+  void set keepOnTop(bool value) {
+  }
+
+  @override
+  bool get keepOnTop => false;
 }
 class _HTML5AppNotification extends AppNotification {
   final Notification _delegate;

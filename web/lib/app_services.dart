@@ -15,9 +15,13 @@ abstract class AppDelegate {
   
   bool get hasNotificationCapabilities;
   bool get hasStorageCapabilities;
+  bool get hasAlwaysOnTopCapabilities;
   
   bool get tryNotifications;
   void set tryNotifications(bool value);
+  
+  bool get keepOnTop;
+  void set keepOnTop(bool value);
   
   bool get isAuthorizedForNotifications;
   Future<bool> authorizeForNotification();
@@ -115,6 +119,20 @@ class JsAppDelegate extends AppDelegate {
   @override
   int get iconSize => 
       _proxy.callMethod('getIconSize',[]);
+
+  // TODO: implement hasAlwaysOnTopCapabilities
+  @override
+  bool get hasAlwaysOnTopCapabilities => 
+      _proxy.callMethod('getHasAlwaysOnTopCapabilities',[]);
+
+  @override
+  void set keepOnTop(bool value) =>
+    _proxy.callMethod('setKeepOnTop',[value]);
+
+  // TODO: implement keepOnTop
+  @override
+  bool get keepOnTop =>
+    _proxy.callMethod('getKeepOnTop',[]);
 }
 
 class _ChromeNotification extends AppNotification {

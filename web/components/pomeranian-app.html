@@ -7,7 +7,9 @@
 <link rel="import" href="packages/paper_elements/paper_menu_button.html">
 <link rel="import" href="packages/paper_elements/paper_item.html">
 <link rel="import" href="packages/paper_elements/paper_toggle_button.html">
+
 <link rel="import" href="../transitions/slide-from-right.html">
+<link rel="import" href="paper-tristate-toggle-button.html">
 
 <polymer-element name="pomeranian-app">
   <template>
@@ -15,12 +17,22 @@
     <core-header-panel>
       <core-toolbar id="mainheader">
         <paper-menu-button icon="menu">
+          <template if="{{hasAlwaysOnTopCapabilities}}">
+            <paper-item label="Keep Window on Top" on-tap="{{toggleKeepOnTop}}">
+              <div class="keep_on_top_description">{{keepOnTopDescription}}</div>
+              <div flex></div>
+              <paper-tristate-toggle-button id="keep-on-top-toggle" 
+                  on-change="{{changeKeepOnTop}}"
+                  state="{{keepOnTop}}">
+              </paper-tristate-toggle-button>
+            </paper-item>
+          </template>
           <div class="paper_group_header">When time is up:</div>
           <div class="paper_group">
             <paper-item label="Show a Notification" on-tap="{{toggleTryNotifications}}">
-              <paper-toggle-button id="try-notifications-toggle" 
-                  checked?="{{tryNotifications}}" 
-                  on-change="{{changeTryNotifications}}">
+              <div flex></div>
+              <paper-toggle-button id="try-notifications-toggle" on-change="{{changeTryNotifications}}"
+                  checked?="{{tryNotifications}}">
               </paper-toggle-button>
             </paper-item>
           </div>
