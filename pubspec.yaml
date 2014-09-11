@@ -7,7 +7,7 @@ dependencies:
   paper_elements: any
   polymer: any
 transformers:
-- chrome
 - polymer:
     entry_points: web/pomeranianchrome.html
     csp: true
+    inject_build_logs_in_output: false

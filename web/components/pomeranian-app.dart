@@ -1,9 +1,11 @@
 import 'package:polymer/polymer.dart';
-import 'dart:html';
+import 'dart:html' hide Notification;
 import 'dart:async';
+import 'dart:js';
 import 'package:paper_elements/paper_toggle_button.dart';
 
 import '../lib/app_services.dart';
+import '../lib/notification_patch.dart';
 
 @CustomTag('pomeranian-app')
 class PomeranianApp extends PolymerElement {
@@ -16,16 +18,26 @@ class PomeranianApp extends PolymerElement {
   DateTime expires = null;
   
   Timer clockTick = null;
-  Timer endOfTimer = null;  
+  Timer endOfTimer = null;
   
   AppDelegate get _appDelegate {
-    if (__appDelegate == null)
-      __appDelegate = new _HTML5AppDelegate();
+    if (__appDelegate == null) {
+      if (context['appDelegate'] != null) {
+        __appDelegate = new JsAppDelegate(context['appDelegate']);
+        
+      }
+      else
+        __appDelegate = new _HTML5AppDelegate();
+    }
     return __appDelegate;
   }
   AppDelegate __appDelegate = null;
   
-  @observable bool tryNotifications = true;
+  bool get tryNotifications => _appDelegate.tryNotifications;
+  void set tryNotifications(bool value) {
+    _appDelegate.tryNotifications = value;
+  }
+  
   bool canDoNotifications = false;
   bool get isAuthorizedForNotifications => 
       !_appDelegate.hasNotificationCapabilities || 
@@ -42,16 +54,55 @@ class PomeranianApp extends PolymerElement {
   
   @override
   ready() {
-    selected = 0;
-    timeRemaining = "Stopped";
-    status = "Pomeranian";
+    if (__appDelegate.alarms.isNotEmpty) {
+      clockTick = new Timer.periodic(
+          const Duration(milliseconds: 500), 
+          (timer) {
+        if (clockTick == null) return;
+        var difference = expires.difference(new DateTime.now());
+        var seconds = difference.inSeconds;
+        var minute = (seconds / 60).floor();
+        seconds %= 60;
+        timeRemaining = "$minute:${seconds.toString().padLeft(2,'0')}";
+      });
+      
+      var duration = __appDelegate.alarms.first.difference(new DateTime.now());
+      
+      endOfTimer = new Timer(
+          duration,
+          () {
+        statusReset();
+        alarm(title);
+      });
+      var seconds = duration.inSeconds;
+      var minute = (seconds / 60).floor();
+      seconds %= 60;
+      timeRemaining = "$minute:${seconds.toString().padLeft(2,'0')}";
+      status = title;
+      selected = 1;
+      
+      expires = __appDelegate.alarms.first;
+      //_appDelegate.postAlarm(expires, status);
+      
+      if (!isAuthorizedForNotifications && tryNotifications) {
+        canDoNotifications = false;
+        _appDelegate.authorizeForNotification().then((result) {
+          canDoNotifications = result;
+        });
+      } else if (isAuthorizedForNotifications)
+        canDoNotifications = true;
+    } else {
+      selected = 0;
+      timeRemaining = "Stopped";
+      status = "Pomeranian";
+    }
   }
   void alarm(String title, [bool notificationOnly = false]) {
     if (canDoNotifications && tryNotifications) {
       var message = 
           (title == 'Sprint')?'Time for a break.':'Time to get back to work.';
       var notification = _appDelegate.createNotification('$title is over.',body: message,
-              icon: '/icon_48.png');
+              icon: '/icon_${_appDelegate.iconSize}.png');
       notification.onClick.listen((ev) =>
         notification.close());
     }
@@ -62,13 +113,20 @@ class PomeranianApp extends PolymerElement {
     clockTick = null; 
     if (endOfTimer != null)
       endOfTimer.cancel();
+    
+    _appDelegate.removeAlarm(expires);
+    
     endOfTimer = null;
     expires = null;
     timeRemaining = "Stopped";
     status = "Pomeranian";
     selected = 0;
   }
-  void setTimer(int timeInMinutes, String title) {
+  void setTimer(int timeInMinutes, String title, Event ev) {
+    if (((ev.target as Node)
+        .parentNode.parentNode as Element)
+        .getAttribute("animate") != null)
+      return;
     clockTick = new Timer.periodic(
         const Duration(milliseconds: 500), 
         (timer) {
@@ -89,7 +147,10 @@ class PomeranianApp extends PolymerElement {
     timeRemaining = "$timeInMinutes:00";
     status = title;
     selected = 1;
+    
     expires = new DateTime.now().add(duration);
+    _appDelegate.postAlarm(expires, status);
+    
     if (!isAuthorizedForNotifications && tryNotifications) {
       canDoNotifications = false;
       _appDelegate.authorizeForNotification().then((result) {
@@ -97,10 +158,14 @@ class PomeranianApp extends PolymerElement {
       });
     }
   }
-  void pomodoroButton() => setTimer(25,"Sprint");
-  void shortBreakButton() => setTimer(1,"Break");
-  void longBreakButton() => setTimer(15,"Break");
-  void stopButton() => statusReset();
+  void pomodoroButton(Event ev) => setTimer(25,"Sprint",ev);
+  void shortBreakButton(Event ev) => setTimer(1,"Break",ev);
+  void longBreakButton(Event ev) => setTimer(15,"Break",ev);
+  void stopButton(Event ev) {
+    if (((ev.target as Node).parentNode.parentNode as Element).getAttribute("animate") != null)
+      return;
+    statusReset();
+  }
   void changeTryNotifications(Event ev) {
     tryNotifications = ($['try-notifications-toggle'] as PaperToggleButton).checked;
     if (tryNotifications && !isAuthorizedForNotifications)
@@ -123,9 +188,11 @@ class PomeranianApp extends PolymerElement {
 
 
 class _HTML5AppDelegate extends AppDelegate {
+  int get iconSize => 48;
   @override bool get isAuthorizedForNotifications => _isAuthorizedForNotifications;
   bool _isAuthorizedForNotifications = false;
   bool _canDoNotifications = false;
+  bool _tryNotifications = true;
   
   _HTML5AppDelegate() : super();
   
@@ -139,7 +206,7 @@ class _HTML5AppDelegate extends AppDelegate {
         if (result == 'granted') 
           completer.complete(_canDoNotifications = true);
         else
-          completer.complete(_canDoNotifications = false);
+          completer.complete(_canDoNotifications = true);
         _isAuthorizedForNotifications = true;
       });
     }
@@ -168,6 +235,30 @@ class _HTML5AppDelegate extends AppDelegate {
 
   @override
   bool get hasStorageCapabilities => true;
+
+  @override
+  Iterable<DateTime> get alarms => [];
+
+  @override
+  void postAlarm(DateTime alarm, String status) {
+    // Do nothing
+  }
+
+  @override
+  void removeAlarm(DateTime alarm) {
+    // Do nothing
+  }
+
+  // TODO: implement tryNotifications
+  @override
+  bool get tryNotifications => _tryNotifications;
+
+  @override
+  void set tryNotifications(bool value) {
+    _tryNotifications = value;
+  }
+  
+  @override String get status => '';
 }
 class _HTML5AppNotification extends AppNotification {
   final Notification _delegate;
@@ -178,4 +269,5 @@ class _HTML5AppNotification extends AppNotification {
     _delegate.close();
   
   @override Stream get onClick => _delegate.onClick;
+  
 }
