@@ -54,7 +54,7 @@ class PomeranianApp extends PolymerElement {
   
   @override
   ready() {
-    if (__appDelegate.alarms.isNotEmpty) {
+    if (__appDelegate.alarm != null) {
       clockTick = new Timer.periodic(
           const Duration(milliseconds: 500), 
           (timer) {
@@ -66,7 +66,8 @@ class PomeranianApp extends PolymerElement {
         timeRemaining = "$minute:${seconds.toString().padLeft(2,'0')}";
       });
       
-      var duration = __appDelegate.alarms.first.difference(new DateTime.now());
+      var duration = __appDelegate.alarm.difference(new DateTime.now());
+      var title = __appDelegate.status;
       
       endOfTimer = new Timer(
           duration,
@@ -81,7 +82,7 @@ class PomeranianApp extends PolymerElement {
       status = title;
       selected = 1;
       
-      expires = __appDelegate.alarms.first;
+      expires = __appDelegate.alarm;
       //_appDelegate.postAlarm(expires, status);
       
       if (!isAuthorizedForNotifications && tryNotifications) {
@@ -91,6 +92,7 @@ class PomeranianApp extends PolymerElement {
         });
       } else if (isAuthorizedForNotifications)
         canDoNotifications = true;
+      selected = 1;
     } else {
       selected = 0;
       timeRemaining = "Stopped";
@@ -159,7 +161,7 @@ class PomeranianApp extends PolymerElement {
     }
   }
   void pomodoroButton(Event ev) => setTimer(25,"Sprint",ev);
-  void shortBreakButton(Event ev) => setTimer(1,"Break",ev);
+  void shortBreakButton(Event ev) => setTimer(5,"Break",ev);
   void longBreakButton(Event ev) => setTimer(15,"Break",ev);
   void stopButton(Event ev) {
     if (((ev.target as Node).parentNode.parentNode as Element).getAttribute("animate") != null)
@@ -237,7 +239,7 @@ class _HTML5AppDelegate extends AppDelegate {
   bool get hasStorageCapabilities => true;
 
   @override
-  Iterable<DateTime> get alarms => [];
+  DateTime get alarm => null;
 
   @override
   void postAlarm(DateTime alarm, String status) {

@@ -22,7 +22,7 @@
 
 import 'dart:html';
 import 'dart:async';
-import 'dart:js';
+//import 'dart:js';
 import 'package:chrome/chrome_app.dart' as chrome;
 
 import 'lib/app_services.dart';
@@ -72,9 +72,11 @@ void onLaunch ([chrome.LaunchData launchData = null]) {
               alwaysOnTop: true
               )).then((appWindow) {
                 windowIsActive = true;
+                /*
                 //TODO: This needs to be more thoroughly validated, since I'm not
                 //sure whether it's possible to miss an alarm here.
-                appWindow.jsProxy['alarm'] = notificationAlarm;
+                appWindow.jsProxy['contentWindow']['appDelegate'] = 
+                    new JsObject.jsify({'test':1});*/
                 appWindow.onClosed.listen((_) {
                   windowIsActive = false;
                 

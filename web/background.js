@@ -30,8 +30,15 @@
       }
       chrome.alarms.getAll(function (alarms) {
         var notificationAlarm;
-        if (alarms)
-          appDelegate.alarms = alarms;
+        if (alarms.length) {
+	  var alarmName = alarms[0].name;
+	  if (alarmName.indexOf('#') == 0)
+	    alarmName = alarmName.slice(1);
+          appDelegate.alarm = {
+            time: alarms[0].scheduledTime,
+            status: alarmName
+          };
+	}
         chrome.app.window.create(
           'pomeranianchrome.html',
           { id:'_mainWindow',
@@ -51,8 +58,9 @@
 	    appWindow.onClosed.addListener(function () {
 	      console.debug('Window Closed');
 	      windowIsActive = false;
-	      if (appDelegate.alarms.length)
-	        chrome.alarms.create('', {when: appDelegate.alarms[0]});
+	      if (appDelegate.alarm)
+	        chrome.alarms.create(
+		  (appDelegate.getTryNotifications()?'':'#') + appDelegate.alarm.status, {when: appDelegate.alarm.time});
 	    });
           });
 	});
@@ -75,11 +83,10 @@
      }
    };
    var appDelegate = {
-     alarms: [],
+     alarm: null,
      storage: {},
      _tryNotifications: true,
      _isAuthorizedForNotifications: false,
-     _status: '',
      getIconSize: function() {return 128;},
      storeKey: function(key, value) {
        if (!this.storage)
@@ -104,11 +111,13 @@
        return this._isAuthorizedForNotifications;
      },
      postAlarm: function(alarmTime, status) {
-       this.alarms[0] = alarmTime;
-       this._status = status;
+       this.alarm = {
+         time: alarmTime,
+         status: status
+       };
      },
      removeAlarm: function(alarmTime) {
-       this.alarms = [];
+       this.alarm = null;
      },
      getTryNotifications: function() {
        return this._tryNotifications;
@@ -116,7 +125,7 @@
      setTryNotifications: function(value) {
        this._tryNotifications = value;
      },
-     createNotification: function(title, options) {
+     createNotification: function (title, options) {
        chrome.notifications.create(
          '_POMERANIAN_NOTIFICATION_',
          { 
@@ -130,20 +139,21 @@
        );
        var thisNotification = {
          _id: '_POMERANIAN_NOTIFICATION_',
-	 _innerListener: null,
+	 innerListener: null,
 	 close: function() {
 	   chrome.notifications.clear(this._id);
 	 },
 	 addEventListener: function(callback) {
-	   if (_innerListener)
+	   if (this.innerListener)
 	     throw "Can only have one listener for _POMERANIAN_NOTIFICATION_.onClick";
-	   this._innerListener = callback;
+	   this.innerListener = callback;
 	 },
 	 removeEventListener: function(callback) {
-	   this._innerListener = null;
+	   this.innerListener = null;
 	 }
        };
-       allNotifications[thisNotification._id] = thisNotification;
+       if (allNotifications)
+         allNotifications[thisNotification._id] = thisNotification;
        return thisNotification;
      },
      authorizeForNotification: function (callback) {
@@ -155,12 +165,19 @@
     appDelegate.storage = keys['_APP_'];
   });
   chrome.app.runtime.onLaunched.addListener(performLaunch);
-  chrome.alarms.onAlarm.addListener(function (alarm) {
-    var message = (appDelegate._status == 'Sprint')?'Time for a break.':'Time to get back to work.';
-    var notification = appDelegate.createNotification(appDelegate._status + ' is over.',
-    { body: message,
-      icon: '/icon_' + appDelegate.getIconSize() + '.png' });
-    appDelegate.alarms = [];
-  });
+  
   chrome.notifications.onClicked.addListener(allNotifications.handleClick);
 })();
+chrome.alarms.onAlarm.addListener(function (alarm) {
+  if (alarm.name.indexOf('#') == 0) return;
+  var message = (alarm.name == 'Sprint')?'Time for a break.':'Time to get back to work.';
+  chrome.notifications.create(
+    '_POMERANIAN_NOTIFICATION_',
+    { type: 'basic',
+      title: alarm.name + ' is over.',
+      message: message,
+      isClickable: true,
+      iconUrl: '/icon_' + 128 + '.png'
+    }, function(_) {}
+  );
+});

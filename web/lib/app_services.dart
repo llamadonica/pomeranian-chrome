@@ -23,7 +23,7 @@ abstract class AppDelegate {
   Future<bool> authorizeForNotification();
   AppNotification createNotification (String title, {String body, String icon});
   
-  Iterable<DateTime> get alarms;
+  DateTime get alarm;
   String get status;
   
   void postAlarm(DateTime alarm, String status);
@@ -41,13 +41,16 @@ class JsAppDelegate extends AppDelegate {
   JsAppDelegate(JsObject this._proxy) : super();
   
   @override
-  String get status => _proxy['_status'];      
+  String get status => 
+      (_proxy['alarm'] == null)?
+          null:
+          _proxy['alarm']['status'];   
   
   @override
-  Iterable<DateTime> get alarms => 
-    new Iterable.generate(
-        _proxy['alarms']['length'],
-        (n) => new DateTime.fromMillisecondsSinceEpoch(_proxy['alarms'][n]));
+  DateTime get alarm => 
+    (_proxy['alarm'] == null)?
+        null:
+        new DateTime.fromMillisecondsSinceEpoch(_proxy['alarm']['time']);
 
   @override
   Future<bool> authorizeForNotification() {
