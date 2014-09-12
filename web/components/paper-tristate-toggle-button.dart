@@ -1,8 +1,9 @@
 import 'package:polymer/polymer.dart';
-import 'package:paper_elements/paper_radio_button.dart';
 import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:js';
+
+import 'paper-tristate-radio-button.dart';
 
 @CustomTag('paper-tristate-toggle-button')
 class PaperTristateToggleButton extends PolymerElement {
@@ -19,16 +20,15 @@ class PaperTristateToggleButton extends PolymerElement {
   }
   void trackx(Event e) {
     var jsProxy = new JsObject.fromBrowserObject(e);
-    _x = Math.min(_w, Math.max(0, (state > 0) ? _w + 
-        jsProxy["dx"] as int : jsProxy["dx"] as int));
-    ($['toggleRadio'] as PaperRadioButton).classes.add('dragging'); //classList.add('dragging');
-    var s = ($['toggleRadio'] as PaperRadioButton).style;
+    _x = Math.min(_w, Math.max(0, ((state == 2) ? _w : ((state == 1) ? _w / 2 : 0)) +  jsProxy["dx"] as int));
+    ($['toggleRadio'] as PaperTristateRadioButton).classes.add('dragging'); //classList.add('dragging');
+    var s = ($['toggleRadio'] as PaperTristateRadioButton).style;
     s.transform = 'translate3d(${_x}px,0,0)';
   }
   void trackEnd() {
-    var s = ($['toggleRadio'] as PaperRadioButton).style;
+    var s = ($['toggleRadio'] as PaperTristateRadioButton).style;
     s.transform = '';
-    ($['toggleRadio'] as PaperRadioButton).classes.remove('dragging');
+    ($['toggleRadio'] as PaperTristateRadioButton).classes.remove('dragging');
     var old = state;
     state = (_x > 3*_w / 4)?2:((_x > _w / 4)?1:0);
     if (state != old)
