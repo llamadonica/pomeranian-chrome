@@ -1,0 +1,77 @@
+<link rel="import" href="packages/core_elements/core_animated_pages.html">
+<link rel="import" href="packages/core_elements/core_media_query.html">
+<link rel="import" href="packages/core_elements/core_header_panel.html">
+<link rel="import" href="packages/core_elements/core_toolbar.html">
+<link rel="import" href="packages/core_elements/core_icons.html">
+<link rel="import" href="packages/paper_elements/paper_button.html">
+<link rel="import" href="packages/paper_elements/paper_menu_button.html">
+<link rel="import" href="packages/paper_elements/paper_item.html">
+<link rel="import" href="packages/paper_elements/paper_toggle_button.html">
+
+<link rel="import" href="../transitions/slide-from-right.html">
+<link rel="import" href="paper-tristate-toggle-button.html">
+
+<polymer-element name="pomeranian-app">
+  <template>
+    <link rel="stylesheet" href="pomeranian-app.css">
+    <core-header-panel>
+      <core-toolbar id="mainheader">
+        <paper-menu-button icon="menu">
+          <template if="{{hasAlwaysOnTopCapabilities}}">
+            <paper-item label="Keep Window on Top" on-tap="{{toggleKeepOnTop}}">
+              <div class="keep_on_top_description">{{keepOnTopDescription}}</div>
+              <div flex></div>
+              <paper-tristate-toggle-button id="keep-on-top-toggle" 
+                  on-change="{{changeKeepOnTop}}"
+                  state="{{keepOnTop}}">
+              </paper-tristate-toggle-button>
+            </paper-item>
+          </template>
+          <div class="paper_group_header">When time is up:</div>
+          <div class="paper_group">
+            <paper-item label="Show a Notification" on-tap="{{toggleTryNotifications}}">
+              <div flex></div>
+              <paper-toggle-button id="try-notifications-toggle" on-change="{{changeTryNotifications}}"
+                  checked?="{{tryNotifications}}">
+              </paper-toggle-button>
+            </paper-item>
+          </div>
+        </paper-menu-button>
+        <span flex>{{status}}</span>
+      </core-toolbar>
+      <div vertical layout fit>
+        <div vertical layout flex id="timer_container_id">
+          <paper-shadow z="1"></paper-shadow>
+          <div flex></div>
+          <div horizontal layout center-justified>
+            <p id="timer_text_id">{{timeRemaining}}</p>
+          </div>
+          <div flex></div>
+        </div>
+        <div layout id="button_bar">
+          <core-animated-pages selected="{{selected}}" transitions="slide-from-right">
+            <section id="stopped">
+               <div class="button_holder" layout horizontal slide-from-right>
+                  <paper-button flex raisedButton class="focused" label="Pomodoro"
+                     id="pomodoro_button_id" on-tap="{{pomodoroButton}}">
+                  </paper-button>
+                  <paper-button flex raisedButton id="short_button_id"
+                     label="Short Break" on-tap="{{shortBreakButton}}"></paper-button>
+                  <paper-button flex raisedButton id="long_button_id"
+                     label="Long Break"  on-tap="{{longBreakButton}}"></paper-button>
+               </div>
+            </section>
+            <section id="active">
+              <div class="button_holder" layout horizontal slide-from-right>
+                <paper-button flex raisedButton id="stop_button_id" label="Stop"
+                    on-tap="{{stopButton}}"></paper-button>
+              </div>
+            </section>
+          </core-animated-pages>
+        </div>
+      </div>
+    </core-header-panel>
+  </template>
+  <script type="application/dart" src="pomeranian-app.dart"></script>
+</polymer-element>
+

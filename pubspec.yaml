@@ -1,5 +1,13 @@
-name: pomeranianChrome
-description: A sample chrome packaged application
+name: pomeranian_chrome
+description: A sample Chrome packaged application
 dependencies:
   browser: any
   chrome: any
+  core_elements: any
+  paper_elements: any
+  polymer: any
+transformers:
+- polymer:
+    entry_points: web/pomeranianchrome.html
+    csp: true
+    inject_build_logs_in_output: false

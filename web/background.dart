@@ -22,9 +22,10 @@
 
 import 'dart:html';
 import 'dart:async';
-import 'dart:js';
+//import 'dart:js';
 import 'package:chrome/chrome_app.dart' as chrome;
-import 'pomeranian_notification_options.dart';
+
+import 'lib/app_services.dart';
 
 void main () {
   windowIsActive = false;
@@ -34,11 +35,8 @@ void main () {
 }
 
 void onAlarm (chrome.Alarm alarm) {
-  if (windowIsActive) return;
-  chrome.notifications.create(
-      "_pomerananianNotification",
-      PomeranianNotificationOptions.notificationOptions(alarm.name));
 }
+
 void onNotificationClicked (String notification) {
   if (windowIsActive) return;
   assert(notification == "_pomerananianNotification");
@@ -47,11 +45,10 @@ void onNotificationClicked (String notification) {
 }
 
 void onLaunch ([chrome.LaunchData launchData = null]) {
-    //DONE: Use chrome APIs to discover OS.
     chrome.runtime.getPlatformInfo().then((platformInfo) {
       String frame = 'chrome';
       chrome.WindowType type;
-      switch (platformInfo['os']) {
+      switch (platformInfo.os) {
         case 'cros':
           type = chrome.WindowType.PANEL;
           break;
@@ -70,23 +67,23 @@ void onLaunch ([chrome.LaunchData launchData = null]) {
               type:type,
               defaultWidth:560,
               defaultHeight:240,
-              minWidth: 400,
-              minHeight: 220,
+              minWidth: 422,
+              minHeight: 200,
               alwaysOnTop: true
               )).then((appWindow) {
                 windowIsActive = true;
+                /*
                 //TODO: This needs to be more thoroughly validated, since I'm not
                 //sure whether it's possible to miss an alarm here.
-                appWindow.jsProxy['alarm'] = notificationAlarm;
+                appWindow.jsProxy['contentWindow']['appDelegate'] = 
+                    new JsObject.jsify({'test':1});*/
                 appWindow.onClosed.listen((_) {
                   windowIsActive = false;
+                
               });
             });
       });
     });
   }
 
-bool get windowIsActive => context['windowIsActive'];
-set windowIsActive (bool value) {
-  context['windowIsActive'] = value;
-}
+bool windowIsActive = false;
