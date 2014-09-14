@@ -64,9 +64,18 @@ class PomeranianApp extends PolymerElement with Observable {
   @ComputedProperty("(keepOnTop == 0)?'Never':((keepOnTop == 1)?'When Stopped':'Always')")
   String get keepOnTopDescription => readValue(#keepOnTopDescription);
   
+  @observable bool tryNotify;
+  void tryNotifyChanged(bool oldValue) {
+    if (_appDelegate.hasStorageCapabilities)
+      _appDelegate.storeKey(
+        "$APP_NAME.notify",
+        tryNotify.toString());
+  }
   
   bool get hasAlwaysOnTopCapabilities =>
     _appDelegate.hasAlwaysOnTopCapabilities;
+  bool get hasNotifyCapabilities =>
+    _appDelegate.hasNotifyCapabilities;
   
   bool canDoNotifications = false;
   bool get isAuthorizedForNotifications => 
@@ -88,12 +97,18 @@ class PomeranianApp extends PolymerElement with Observable {
                   int.parse(enableAlwaysOnTop,onError: (_) => 0));
         }
       }
+      if (_appDelegate.hasNotifyCapabilities) {
+        var enableNotify = _appDelegate.getKey("$APP_NAME.notify");
+        if (enableNotify != null) {
+          tryNotify = enableNotify == "true";
+        }
+      }
     }
   }
   
   @override
   ready() {
-    if (__appDelegate.alarm != null) {
+    if (_appDelegate.alarm != null) {
       clockTick = new Timer.periodic(
           const Duration(milliseconds: 500), 
           (timer) {
@@ -149,6 +164,8 @@ class PomeranianApp extends PolymerElement with Observable {
       notification.onClick.listen((ev) =>
         notification.close());
     }
+    if (hasNotifyCapabilities && tryNotify)
+      _appDelegate.setNotify();
   }
   void statusReset() {
     if (clockTick != null)
@@ -198,6 +215,9 @@ class PomeranianApp extends PolymerElement with Observable {
     expires = new DateTime.now().add(duration);
     _appDelegate.postAlarm(expires, status);
     
+    if (hasNotifyCapabilities)
+      _appDelegate.clearNotify();
+    
     if (!isAuthorizedForNotifications && tryNotifications) {
       canDoNotifications = false;
       _appDelegate.authorizeForNotification().then((result) {
@@ -218,7 +238,7 @@ class PomeranianApp extends PolymerElement with Observable {
   }
   void toggleTryNotifications(Event ev) {
     PaperToggleButton toggleButton = $['try-notifications-toggle'];
-    if (ev.target == toggleButton) ev.stopPropagation();
+    if (ev.target == toggleButton) return;
     
     tryNotifications = !tryNotifications;
     if (tryNotifications && !isAuthorizedForNotifications)
@@ -235,9 +255,16 @@ class PomeranianApp extends PolymerElement with Observable {
     
     toggleButton.state = (toggleButton.state + 1) % 3;
   }
+  void changeTryNotify(Event ev) {
+    tryNotify = ($['try-notify-toggle'] as PaperToggleButton).checked;
+  }
+  void toggleTryNotify(Event ev) {
+    PaperToggleButton toggleButton = $['try-notify-toggle'];
+    if (ev.target == toggleButton) return;
+      
+    tryNotify = !tryNotify;
+  }
 }
-
-
 
 class _HTML5AppDelegate extends AppDelegate {
   int get iconSize => 48;
@@ -301,7 +328,6 @@ class _HTML5AppDelegate extends AppDelegate {
     // Do nothing
   }
 
-  // TODO: implement tryNotifications
   @override
   bool get tryNotifications => _tryNotifications;
 
@@ -312,17 +338,29 @@ class _HTML5AppDelegate extends AppDelegate {
   
   @override String get status => '';
 
-  // TODO: implement hasAlwaysOnTopCapabilities
   @override
   bool get hasAlwaysOnTopCapabilities => 
       false;
 
   @override
   void set keepOnTop(bool value) {
+    throw new UnsupportedError("set keepOnTop not supported.");
   }
 
   @override
-  bool get keepOnTop => false;
+  bool get keepOnTop => 
+      throw new UnsupportedError("get keepOnTop not supported.");
+  
+  @override
+  bool get hasNotifyCapabilities => false;
+
+  @override
+  void clearNotify() =>
+    throw new UnsupportedError("clearNotify not supported.");
+
+  @override
+  void setNotify() =>
+    throw new UnsupportedError("setNotify not supported.");
 }
 class _HTML5AppNotification extends AppNotification {
   final Notification _delegate;

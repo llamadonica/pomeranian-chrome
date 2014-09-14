@@ -112,6 +112,9 @@
      getHasAlwaysOnTopCapabilities: function() {
        return true;
      },
+     getHasNotifyCapabilities: function() {
+       return true;
+     },
      getIsAuthorizedForNotifications: function() {
        return this._isAuthorizedForNotifications;
      },
@@ -173,6 +176,16 @@
      authorizeForNotification: function (callback) {
        this._isAuthorizedForNotifications = true;
        if (callback) callback(true);
+     },
+     setNotify: function () {
+       var window = chrome.app.window.get('_mainWindow');
+       if (window)
+         window.drawAttention();
+     },
+     clearNotify: function () {
+       var window = chrome.app.window.get('_mainWindow');
+       if (window)
+         window.clearAttention();
      }
    }
   chrome.storage.local.get('_APP_',function(keys) {

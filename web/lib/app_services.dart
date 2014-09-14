@@ -16,12 +16,16 @@ abstract class AppDelegate {
   bool get hasNotificationCapabilities;
   bool get hasStorageCapabilities;
   bool get hasAlwaysOnTopCapabilities;
+  bool get hasNotifyCapabilities;
   
   bool get tryNotifications;
   void set tryNotifications(bool value);
-  
+
   bool get keepOnTop;
   void set keepOnTop(bool value);
+  
+  void setNotify();
+  void clearNotify();
   
   bool get isAuthorizedForNotifications;
   Future<bool> authorizeForNotification();
@@ -37,7 +41,6 @@ abstract class AppDelegate {
   String getKey(String key);
   
   AppDelegate();
-  //factory AppDelegate() => new _HTML5AppDelegate();
 }
 class JsAppDelegate extends AppDelegate {
   final JsObject _proxy;
@@ -81,7 +84,6 @@ class JsAppDelegate extends AppDelegate {
   String getKey(String key) =>
     _proxy.callMethod('getKey',[key]);
 
-  // TODO: implement hasNotificationCapabilities
   @override
   bool get hasNotificationCapabilities => 
       _proxy.callMethod('getHasNotificationCapabilities',[]);
@@ -106,7 +108,6 @@ class JsAppDelegate extends AppDelegate {
   void storeKey(String key, String value) =>
       _proxy.callMethod('storeKey',[key, value]);
 
-  // TODO: implement tryNotifications
   @override
   bool get tryNotifications => 
       _proxy.callMethod('getTryNotifications',[]);
@@ -129,10 +130,21 @@ class JsAppDelegate extends AppDelegate {
   void set keepOnTop(bool value) =>
     _proxy.callMethod('setKeepOnTop',[value]);
 
-  // TODO: implement keepOnTop
   @override
   bool get keepOnTop =>
     _proxy.callMethod('getKeepOnTop',[]);
+
+  @override
+  bool get hasNotifyCapabilities => 
+      _proxy.callMethod('getHasNotifyCapabilities',[]);
+
+  @override
+  void clearNotify()  => 
+      _proxy.callMethod('clearNotify',[]);
+
+  @override
+  void setNotify() => 
+      _proxy.callMethod('setNotify',[]);
 }
 
 class _ChromeNotification extends AppNotification {

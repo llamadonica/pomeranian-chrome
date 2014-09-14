@@ -18,7 +18,7 @@
       <core-toolbar id="mainheader">
         <paper-menu-button icon="menu">
           <template if="{{hasAlwaysOnTopCapabilities}}">
-            <paper-item label="Keep Window on Top" on-tap="{{toggleKeepOnTop}}">
+            <paper-item label="Keep window on top" on-tap="{{toggleKeepOnTop}}">
               <div class="keep_on_top_description">{{keepOnTopDescription}}</div>
               <div flex></div>
               <paper-tristate-toggle-button id="keep-on-top-toggle" 
@@ -27,14 +27,22 @@
               </paper-tristate-toggle-button>
             </paper-item>
           </template>
-          <div class="paper_group_header">When time is up:</div>
+          <div class="{{(hasAlwaysOnTopCapabilities?'':'first ') + 'paper_group_header'}}" style="background-color: #fff;">When time is up:</div>
           <div class="paper_group">
-            <paper-item label="Show a Notification" on-tap="{{toggleTryNotifications}}">
+            <paper-item label="Show a notification" on-tap="{{toggleTryNotifications}}">
               <div flex></div>
               <paper-toggle-button id="try-notifications-toggle" on-change="{{changeTryNotifications}}"
                   checked?="{{tryNotifications}}">
               </paper-toggle-button>
             </paper-item>
+            <template if="{{hasNotifyCapabilities}}">
+              <paper-item label="Flash the icon" on-tap="{{toggleTryNotify}}">
+                <div flex></div>
+                <paper-toggle-button id="try-notify-toggle" on-change="{{changeTryNotify}}"
+                    checked?="{{tryNotify}}">
+                </paper-toggle-button>
+              </paper-item>
+            </template>
           </div>
         </paper-menu-button>
         <span flex>{{status}}</span>

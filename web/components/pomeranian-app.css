@@ -73,8 +73,9 @@ paper-tristate-toggle-button::shadow #toggleBar[status="1"] {
   padding: 6px 12px 0;
   font-size: 14px;
   font-weight: bold;
+  position: relative;
 }
-.paper_group_header:not(:first-child) {
+.paper_group_header:not(:first-child):not(.first) {
   border-top: 1px solid #dddddd;
   margin-top: 0;
 }
@@ -82,4 +83,7 @@ paper-tristate-toggle-button::shadow #toggleBar[status="1"] {
   color: #808080;
   padding-left: 8px;
   min-width: 114px;
+}
+paper-menu-button::shadow core-popup-menu::shadow #menu {
+  overflow: hidden;
 }
