@@ -1,5 +1,6 @@
 import 'package:polymer/polymer.dart';
 import 'dart:html' hide Notification;
+import 'dart:web_audio';
 import 'dart:async';
 import 'dart:js';
 import 'package:paper_elements/paper_toggle_button.dart';
@@ -11,6 +12,9 @@ import 'paper-tristate-toggle-button.dart';
 @CustomTag('pomeranian-app')
 class PomeranianApp extends PolymerElement with Observable {
   static const String APP_NAME = "pomeranian_chrome";
+  static const String RINGING_URI = "assets/sounds/ring.ogg";
+  static const String WIND_UP_URI = "assets/sounds/wind.ogg";
+  static const String TICKING_URI = "assets/sounds/tick-loop.ogg";
   
   @observable int selected;
   @observable String timeRemaining;
@@ -20,6 +24,8 @@ class PomeranianApp extends PolymerElement with Observable {
   
   Timer clockTick = null;
   Timer endOfTimer = null;
+  
+  AudioBufferSourceNode _tickingLoop;
   
   AppDelegate get _appDelegate {
     if (__appDelegate == null) {
@@ -33,6 +39,14 @@ class PomeranianApp extends PolymerElement with Observable {
     return __appDelegate;
   }
   AppDelegate __appDelegate = null;
+  
+  AudioContext _audioContext;
+  AudioContext get audioContext {
+    if (_audioContext == null)
+      _audioContext = new AudioContext();
+    return _audioContext;
+  }
+  
   
   @observable bool tryNotifications = true;
   void tryNotificationsChanged(bool oldValue) {
@@ -72,6 +86,43 @@ class PomeranianApp extends PolymerElement with Observable {
         tryNotify.toString());
   }
   
+  @observable bool doAlarmAudio = false;
+  void doAlarmAudioChanged(bool oldValue) {
+    _appDelegate.doAlarmAudio = doAlarmAudio;
+    if (_appDelegate.hasStorageCapabilities)
+      _appDelegate.storeKey(
+          "$APP_NAME.doAlarmAudio",
+          doAlarmAudio.toString());
+  }
+
+  @observable bool doTickAudio = false;
+  void doTickAudioChanged(bool oldValue) {
+    if (_appDelegate.hasStorageCapabilities)
+      _appDelegate.storeKey(
+          "$APP_NAME.doTickAudio",
+          doTickAudio.toString());
+    if (expires != null && doTickAudio) {
+      var request_ticking = new HttpRequest();
+      request_ticking.onLoad.listen((event) {
+        audioContext.decodeAudioData(request_ticking.response).then((buffer) {
+          if (!doAlarmAudio) return;
+         
+          _tickingLoop = audioContext.createBufferSource();
+          _tickingLoop.buffer = buffer;
+          _tickingLoop.connectNode(audioContext.destination);
+          _tickingLoop.loop = true;
+          _tickingLoop.start(0);
+        });
+      });
+      request_ticking.responseType = 'arraybuffer';
+      request_ticking.open('GET', TICKING_URI);
+      request_ticking.send();
+    } else if (!doTickAudio && _tickingLoop != null) {
+      _tickingLoop.stop(0);
+      _tickingLoop = null;
+    }
+  }
+  
   bool get hasAlwaysOnTopCapabilities =>
     _appDelegate.hasAlwaysOnTopCapabilities;
   bool get hasNotifyCapabilities =>
@@ -87,6 +138,14 @@ class PomeranianApp extends PolymerElement with Observable {
       var enableNotifications = _appDelegate.getKey("$APP_NAME.notifications");
       if (enableNotifications != null) {
         _appDelegate.tryNotifications = tryNotifications = (enableNotifications == "true");
+      }
+      var enableAlarmAudio = _appDelegate.getKey("$APP_NAME.doAlarmAudio");
+      if (enableAlarmAudio != null) {
+        doAlarmAudio = (enableAlarmAudio == "true");
+      }
+      var enableTickAudio = _appDelegate.getKey("$APP_NAME.doTickAudio");
+      if (enableTickAudio != null) {
+        doTickAudio = (enableTickAudio == "true");
       }
       if (_appDelegate.hasAlwaysOnTopCapabilities) {
         var enableAlwaysOnTop = _appDelegate.getKey("$APP_NAME.alwaysOnTop");
@@ -139,6 +198,25 @@ class PomeranianApp extends PolymerElement with Observable {
         _appDelegate.keepOnTop = false;
       
       expires = __appDelegate.alarm;
+      
+      if (doTickAudio) {
+        var request_ticking = new HttpRequest();
+        request_ticking.onLoad.listen((event) {
+          audioContext.decodeAudioData(request_ticking.response).then((buffer) {
+            if (!doAlarmAudio) return;
+             
+            _tickingLoop = audioContext.createBufferSource();
+            _tickingLoop.buffer = buffer;
+            _tickingLoop.connectNode(audioContext.destination);
+            _tickingLoop.loop = true;
+            _tickingLoop.start(0);
+          });
+        });
+        request_ticking.responseType = 'arraybuffer';
+        request_ticking.open('GET', TICKING_URI);
+        request_ticking.send();
+      }
+      
       //_appDelegate.postAlarm(expires, status);
       
       if (!isAuthorizedForNotifications && tryNotifications) {
@@ -166,6 +244,24 @@ class PomeranianApp extends PolymerElement with Observable {
     }
     if (hasNotifyCapabilities && tryNotify)
       _appDelegate.setNotify();
+    if (_tickingLoop != null) {
+      _tickingLoop.stop(0);
+      _tickingLoop = null;
+    }
+    if (doAlarmAudio) {
+      var request = new HttpRequest();
+      request.onLoad.listen((event) {
+        audioContext.decodeAudioData(request.response).then((buffer) {
+          var source = audioContext.createBufferSource();
+          source.buffer = buffer;
+          source.connectNode(audioContext.destination);
+          source.start(0);
+        });
+      });
+      request.open('GET', RINGING_URI);
+      request.responseType = 'arraybuffer';
+      request.send();
+    }
   }
   void statusReset() {
     if (clockTick != null)
@@ -224,6 +320,23 @@ class PomeranianApp extends PolymerElement with Observable {
         canDoNotifications = result;
       });
     }
+    
+    if (doTickAudio) {
+      var buffers = new BufferLoader(this.audioContext,[WIND_UP_URI, TICKING_URI]);
+      buffers.onLoaded.listen((_) {
+        buffers.sources[WIND_UP_URI].connectNode(audioContext.destination);
+        new Timer(new Duration(milliseconds: 
+            (buffers.sources[WIND_UP_URI].buffer.duration*1000).floor()),() {
+          if (!doAlarmAudio) return;
+          _tickingLoop = buffers.sources[TICKING_URI];
+          buffers.sources[TICKING_URI].connectNode(audioContext.destination);
+          buffers.sources[TICKING_URI].loop = true;
+          buffers.sources[TICKING_URI].start(0);
+        });
+        buffers.sources[WIND_UP_URI].start(0);
+      });
+      buffers.send();
+    }
   }
   void pomodoroButton(Event ev) => setTimer(25,"Sprint",ev);
   void shortBreakButton(Event ev) => setTimer(5,"Break",ev);
@@ -264,6 +377,24 @@ class PomeranianApp extends PolymerElement with Observable {
       
     tryNotify = !tryNotify;
   }
+  void changePlayBell(Event ev) {
+    doAlarmAudio = ($['alarm-audio-toggle'] as PaperToggleButton).checked;
+  }
+  void togglePlayBell(Event ev) {
+    PaperToggleButton toggleButton = $['alarm-audio-toggle'];
+    if (ev.target == toggleButton) return;
+      
+    doAlarmAudio = !doAlarmAudio;
+  }
+  void changePlayTick(Event ev) {
+    doTickAudio = ($['tick-audio-toggle'] as PaperToggleButton).checked;
+  }
+  void togglePlayTick(Event ev) {
+    PaperToggleButton toggleButton = $['tick-audio-toggle'];
+    if (ev.target == toggleButton) return;
+      
+    doTickAudio = !doTickAudio;
+  }
 }
 
 class _HTML5AppDelegate extends AppDelegate {
@@ -272,6 +403,7 @@ class _HTML5AppDelegate extends AppDelegate {
   bool _isAuthorizedForNotifications = false;
   bool _canDoNotifications = false;
   bool _tryNotifications = true;
+  bool _doAlarmAudio = false;
   
   _HTML5AppDelegate() : super();
   
@@ -361,6 +493,14 @@ class _HTML5AppDelegate extends AppDelegate {
   @override
   void setNotify() =>
     throw new UnsupportedError("setNotify not supported.");
+
+  @override
+  bool get doAlarmAudio => _doAlarmAudio;
+
+  @override
+  void set doAlarmAudio(bool value) {
+    _doAlarmAudio = value;
+  }
 }
 class _HTML5AppNotification extends AppNotification {
   final Notification _delegate;
@@ -371,5 +511,45 @@ class _HTML5AppNotification extends AppNotification {
     _delegate.close();
   
   @override Stream get onClick => _delegate.onClick;
+}
+class BufferLoader {
+  final AudioContext audioContext;
+  final List<String> _urlList;
+  final Map<String,AudioBufferSourceNode> sources = new Map();
+  int _count;
+
+  final StreamController _onLoaded = new StreamController();
+  Stream get onLoaded => _onLoaded.stream;
+  
+  final StreamController _onError = new StreamController();
+  Stream get onError => _onError.stream;
+  
+  BufferLoader(AudioContext this.audioContext, List<String> urlList) :
+    _count = urlList.length,
+    _urlList = new List.from(urlList);
+  void send() {
+    for (var url in _urlList) {
+      var request = new HttpRequest();
+      request.onLoad.listen((onData) {
+        audioContext.decodeAudioData(request.response).then((buffer) {
+          var source = audioContext.createBufferSource();
+          source.buffer = buffer;
+          sources[url] = source;
+          if (--_count == 0) {
+            _onLoaded.add(null);
+          }
+        },
+        onError: (error) {
+          _onError.add(error);
+        });
+      });
+      request.onError.listen((progress) {
+        _onError.add(progress);
+      });
+      request.responseType = 'arraybuffer';
+      request.open('GET', url);
+      request.send();
+    }
+  }
   
 }

@@ -24,6 +24,9 @@ abstract class AppDelegate {
   bool get keepOnTop;
   void set keepOnTop(bool value);
   
+  bool get doAlarmAudio;
+  void set doAlarmAudio(bool value);
+  
   void setNotify();
   void clearNotify();
   
@@ -145,6 +148,15 @@ class JsAppDelegate extends AppDelegate {
   @override
   void setNotify() => 
       _proxy.callMethod('setNotify',[]);
+  
+
+  @override
+  void set doAlarmAudio(bool value) =>
+    _proxy.callMethod('setDoAlarmAudio',[value]);
+
+  @override
+  bool get doAlarmAudio=>
+    _proxy.callMethod('getDoAlarmAudio',[]);
 }
 
 class _ChromeNotification extends AppNotification {

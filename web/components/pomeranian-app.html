@@ -17,6 +17,12 @@
     <core-header-panel>
       <core-toolbar id="mainheader">
         <paper-menu-button icon="menu">
+          <paper-item label="Tick when active" on-tap="{{togglePlayTick}}">
+            <div flex></div>
+            <paper-toggle-button id="tick-audio-toggle" on-change="{{changePlayTick}}"
+                checked?="{{doTickAudio}}">
+            </paper-toggle-button>
+          </paper-item>
           <template if="{{hasAlwaysOnTopCapabilities}}">
             <paper-item label="Keep window on top" on-tap="{{toggleKeepOnTop}}">
               <div class="keep_on_top_description">{{keepOnTopDescription}}</div>
@@ -43,6 +49,12 @@
                 </paper-toggle-button>
               </paper-item>
             </template>
+            <paper-item label="Play a sound" on-tap="{{togglePlayBell}}">
+              <div flex></div>
+              <paper-toggle-button id="alarm-audio-toggle" on-change="{{changePlayBell}}"
+                  checked?="{{doAlarmAudio}}">
+              </paper-toggle-button>
+            </paper-item>
           </div>
         </paper-menu-button>
         <span flex>{{status}}</span>

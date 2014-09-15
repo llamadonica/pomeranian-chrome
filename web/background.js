@@ -31,14 +31,16 @@
       chrome.alarms.getAll(function (alarms) {
         var notificationAlarm;
         if (alarms.length) {
-	  var alarmName = alarms[0].name;
-	  if (alarmName.indexOf('#') == 0)
-	    alarmName = alarmName.slice(1);
+          var alarmName = alarms[0].name;
+	        if (alarmName.indexOf('#') == 0)
+	          alarmName = alarmName.slice(1);
+	        if (alarmName.indexOf('$') == 0)
+            alarmName = alarmName.slice(1);
           appDelegate.alarm = {
             time: alarms[0].scheduledTime,
             status: alarmName
           };
-	}
+        }
         chrome.app.window.create(
           'pomeranianchrome.html',
           { id:'_mainWindow',
@@ -51,19 +53,20 @@
             alwaysOnTop: true },
           function (appWindow) {
             appWindow.contentWindow.appDelegate = appDelegate;
-	    windowIsActive = true;
-	    chrome.alarms.clearAll();
-	    console.debug('Window Opened');
+            windowIsActive = true;
+            chrome.alarms.clearAll();
 	    
-	    appWindow.onClosed.addListener(function () {
-	      console.debug('Window Closed');
-	      windowIsActive = false;
-	      if (appDelegate.alarm)
-	        chrome.alarms.create(
-		  (appDelegate.getTryNotifications()?'':'#') + appDelegate.alarm.status, {when: appDelegate.alarm.time});
-	    });
+            appWindow.onClosed.addListener(function () {
+              windowIsActive = false;
+              if (appDelegate.alarm)
+                chrome.alarms.create(
+                  (appDelegate.getTryNotifications()?'':'#') + 
+                  (appDelegate.getDoAlarmAudio()?'$':'') + 
+                  appDelegate.alarm.status,
+                  { when: appDelegate.alarm.time});
+            });
           });
-	});
+        });
      });
    };
    var windowIsActive = false;
@@ -73,12 +76,12 @@
          this[id].innerListener(null);
        if (id == '_POMERANIAN_NOTIFICATION_') {
          if (windowIsActive) {
-	   var mainWindow = chrome.app.window.get('_mainWindow');
-	   mainWindow.clearAttention();
-	   mainWindow.show();
-	 } else {
-	   performLaunch();
-	 }
+           var mainWindow = chrome.app.window.get('_mainWindow');
+           mainWindow.clearAttention();
+           mainWindow.show();
+         } else {
+           performLaunch();
+         }
        }
        chrome.notifications.clear(id, function(_) {;});
      }
@@ -152,22 +155,22 @@
 	   isClickable: true,
 	   iconUrl: (options && options.icon)?options.icon:''
          },
-	 function(_) {}
+         function(_) {}
        );
        var thisNotification = {
          _id: '_POMERANIAN_NOTIFICATION_',
-	 innerListener: null,
-	 close: function() {
-	   chrome.notifications.clear(this._id);
-	 },
-	 addEventListener: function(callback) {
-	   if (this.innerListener)
-	     throw "Can only have one listener for _POMERANIAN_NOTIFICATION_.onClick";
-	   this.innerListener = callback;
-	 },
-	 removeEventListener: function(callback) {
-	   this.innerListener = null;
-	 }
+         innerListener: null,
+         close: function() {
+           chrome.notifications.clear(this._id);
+         },
+         addEventListener: function(callback) {
+           if (this.innerListener)
+             throw "Can only have one listener for _POMERANIAN_NOTIFICATION_.onClick";
+           this.innerListener = callback;
+         },
+         removeEventListener: function(callback) {
+           this.innerListener = null;
+         }
        };
        if (allNotifications)
          allNotifications[thisNotification._id] = thisNotification;
@@ -186,6 +189,12 @@
        var window = chrome.app.window.get('_mainWindow');
        if (window)
          window.clearAttention();
+     },
+     getDoAlarmAudio: function() {
+       return this._doAlarmAudio;
+     },
+     setDoAlarmAudio: function(value) {
+       this._doAlarmAudio = value;
      }
    }
   chrome.storage.local.get('_APP_',function(keys) {
@@ -199,15 +208,44 @@ chrome.notifications.onClicked.addListener(function(id) {
   chrome.notifications.clear(id, function(_) {;});
 });
 chrome.alarms.onAlarm.addListener(function (alarm) {
-  if (alarm.name.indexOf('#') == 0) return;
-  var message = (alarm.name == 'Sprint')?'Time for a break.':'Time to get back to work.';
-  chrome.notifications.create(
-    '_POMERANIAN_NOTIFICATION_',
-    { type: 'basic',
-      title: alarm.name + ' is over.',
-      message: message,
-      isClickable: true,
-      iconUrl: '/icon_' + 128 + '.png'
-    }, function(_) {}
-  );
+  var alarmName = alarm.name;
+  var notify = true;
+  audio = false;
+  if (alarmName.indexOf('#') == 0) {
+    notify = false;
+    alarmName = alarmName.slice(1);
+  }
+  if (alarmName.indexOf('$') == 0) {
+    audio = true;
+    alarmName = alarmName.slice(1);
+  }
+
+  var message = (alarmName == 'Sprint')?'Time for a break.':'Time to get back to work.';
+  if (notify)
+    chrome.notifications.create(
+      '_POMERANIAN_NOTIFICATION_',
+      { type: 'basic',
+        title: alarmName + ' is over.',
+        message: message,
+        isClickable: true,
+        iconUrl: '/icon_' + 128 + '.png'
+      }, function(_) {}
+    );
+  if (audio) {
+    var context = new AudioContext();
+    var request = new XMLHttpRequest();
+    var uri = 'assets/sounds/ring.ogg';
+    request.addEventListener('load',function(e) {
+      context.decodeAudioData(request.response, function(buffer) {
+        var source = context.createBufferSource(); // creates a sound source
+        source.buffer = buffer;                    // tell the source which sound to play
+        source.connect(context.destination);       // connect the source to the context's destination (the speakers)
+        source.start(0);
+      });
+    });
+    request.responseType = 'arraybuffer';
+    request.open('GET', uri, true);
+    request.send();
+    
+  }
 });
