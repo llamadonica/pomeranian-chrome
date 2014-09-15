@@ -14,6 +14,10 @@ import 'package:polymer/src/build/common.dart' as polymer;
 import 'package:html5lib/parser.dart';
 import 'package:html5lib/dom.dart';
 
+import 'package:http/http.dart' as http;
+
+import 'dart:io';
+
 class TransformOptions {
   final polymer.TransformOptions polymerOptions;
   TransformOptions({entryPoints, inlineStylesheets,
@@ -28,6 +32,190 @@ class TransformOptions {
           releaseMode: releaseMode,
           lint: lint,
           injectBuildLogsInOutput: injectBuildLogsInOutput);
+}
+
+class CssImporter extends Transformer {
+  CssImporter.asPlugin();
+  CssImporter();
+  
+  Map<String, String> _urls = new Map();
+  Map<String, String> _shortnames = new Map();
+  Map<String, int> _shortnamesIndices = new Map();
+  
+  static const String IMPORT_REGEX = 
+      r'''@import\s+url\(\s*('|"|)((http:|https:|)//[^ '")]+)('|"|)\s*\)\s*''';
+  static const String SHORTNAME_REGEX = 
+      r'''.*/([^/?]*)(\?.*)?$''';
+  static const String URL_REGEX = 
+        r'''url\(\s*('|"|)((http:|https:|)//[^ '")]+)('|"|)\s*\)\s*''';
+  
+  
+  String get allowedExtensions => ".css .html";
+  Future apply(Transform transform) =>
+    applyAsset(transform.primaryInput, transform);
+  Future applyAsset(Asset asset, Transform transform) {
+    return asset.readAsString().then((String content) {
+      var completer = new Completer();
+      if (asset.id.extension == '.css') {
+        importCss(content, transform).then((newContent) {
+          if (newContent != content) {
+            transform.addOutput(new Asset.fromString(asset.id, newContent));
+          }
+          completer.complete();
+        });
+      } else if (asset.id.extension == '.html') {
+        importHtml(content, transform).then((newContent) {
+          if (newContent != content) {
+            transform.addOutput(new Asset.fromString(asset.id, newContent));
+          }
+          completer.complete();
+        });
+      } else {
+        completer.complete();
+      }
+      return completer.future;
+    });
+    
+  }
+  Future<String> importCss(String content, Transform transform) {
+    var regex = new RegExp(IMPORT_REGEX);
+    
+    var matches = regex.allMatches(content).toList().reversed;
+    
+    Ref<int> ref = new Ref();
+    ref.value = 0;
+    Completer completer = new Completer();
+    
+    for (var match in matches) {
+      ref.value++;
+      var url = match.group(2);
+      if (url.startsWith('//'))
+        url = 'https:' + url;
+      transform.logger.info("GETting $url");
+      var shortname_regex = new RegExp(SHORTNAME_REGEX);
+      var shortname = url;
+      if (shortname_regex.hasMatch(url)) {
+        shortname = shortname_regex.firstMatch(url).group(1);
+      }
+      
+       
+      if (!_urls.containsKey(url)) {
+        if (_shortnames.containsKey(shortname)) {
+          if (!_shortnamesIndices.containsKey(shortname)) {
+            _shortnamesIndices[shortname] = 0;
+          }
+          shortname = shortname + '_' + (++_shortnamesIndices[shortname]).toString();  
+        }
+        
+        _shortnames[shortname] = url;
+        _urls[url] = shortname;
+        
+        http.get(url).then((response) {
+          transform.logger.info("$url => assets/downloads/$shortname.css");
+          importCss(response.body, transform).then((newContent) {
+            var newAsset = new Asset.fromString(
+                new AssetId(
+                  transform.primaryInput.id.package,
+                  "web/assets/downloads/$shortname.css"), newContent);
+            transform.addOutput(newAsset);
+            if (--ref.value == 0) {
+              completer.complete();
+            }
+          });
+        });
+      } else {
+        shortname = _urls[url];
+        if (--ref.value == 0) {
+          completer.complete();
+        }
+      }
+      var newScript = "@import url('/assets/downloads/$shortname.css');";
+      content = content.substring(0, match.start)
+              + newScript + content.substring(match.end);
+    }
+    
+    regex = new RegExp(URL_REGEX);
+    matches = regex.allMatches(content).toList().reversed;
+    for (var match in matches) {
+      ref.value++;
+      var url = match.group(2);
+      if (url.startsWith('//'))
+        url = 'https:' + url;
+      transform.logger.info("GETting $url");
+      var shortname_regex = new RegExp(SHORTNAME_REGEX);
+      var shortname = url;
+      if (shortname_regex.hasMatch(url)) {
+        shortname = shortname_regex.firstMatch(url).group(1);
+      }
+    
+           
+      if (!_urls.containsKey(url)) {
+        if (_shortnames.containsKey(shortname)) {
+          if (!_shortnamesIndices.containsKey(shortname)) {
+            _shortnamesIndices[shortname] = 0;
+          }
+          shortname = shortname + '_' + (++_shortnamesIndices[shortname]).toString();  
+        }
+            
+        _shortnames[shortname] = url;
+        _urls[url] = shortname;
+            
+        http.get(url).then((response) {
+          transform.logger.info("$url => assets/downloads/$shortname");
+          transform.addOutput(new Asset.fromString(
+              new AssetId(
+                  transform.primaryInput.id.package,
+                  "web/assets/downloads/$shortname"), response.body));
+          if (--ref.value == 0) {
+            completer.complete();
+          }
+        });
+      } else {
+        shortname = _urls[url];
+        if (--ref.value == 0) {
+          completer.complete();
+        }
+      }
+      var newScript = "url('/assets/downloads/$shortname');";
+      content = content.substring(0, match.start)
+              + newScript + content.substring(match.end);
+    }
+    
+    if (ref.value == 0 && !completer.isCompleted)
+      completer.complete();
+    
+    return completer.future.then((_) => content);
+  }
+  Future<String> importHtml(String content, Transform transform) {
+    Document document = parse(content, encoding: 'UTF-8');
+    var styles = document.querySelectorAll('style');
+    
+    Ref<int> ref = new Ref();
+    ref.value = 0;
+    Completer completer = new Completer();
+    
+    for (var style in styles) {
+      ref.value++;
+      importCss(style.innerHtml, transform).then((newStyle) {
+        if (style.innerHtml == newStyle) return;
+        style.text = newStyle;
+      }).then((_) {
+        if (--ref.value == 0)
+          completer.complete();
+      });
+    }
+    if (styles == null || styles.length == 0) 
+      completer.complete();
+    return completer.future.then((_) => document.outerHtml);
+  }
+}
+
+class Ref<T> {
+  T _value;
+  T get value => _value;
+  void set value(T input) {
+    _value = input;
+  }
 }
 
 class ChromeTransformer extends Transformer {
@@ -45,13 +233,10 @@ class ChromeTransformer extends Transformer {
   }
 
   Future apply(Transform transform) {
-    print("Transforming ${transform.primaryInput.id.path}");
     return transform.primaryInput.readAsString().then((String content) {
       var id = transform.primaryInput.id;
-      print("Checking ${transform.primaryInput.id.path}");
       String newContent = rewriteContent(content,transform.primaryInput.id.path);
       if (newContent != content) {
-        print("Changed ${transform.primaryInput.id.path}");
         transform.addOutput(new Asset.fromString(id, newContent));
       }
     });
@@ -70,11 +255,9 @@ class ChromeTransformer extends Transformer {
     for (Element script in scripts) {
       
       if (script.attributes['type'] == 'application/dart') {
-        print("Found dart application in $path");
         script.attributes.remove('type');
         script.attributes['src'] = script.attributes['src'] + '.precompiled.js';
       } else if (_regex.hasMatch(script.attributes['src'])) {
-        print("Found non-CSP application in $path");
         script.attributes['src'] = 
             _regex.firstMatch(script.attributes['src']).group(1) + '.html_bootstrap.dart.precompiled.js';
       }
@@ -89,7 +272,7 @@ class ChromeTransformer extends Transformer {
 ///   * Extract inlined script tags into their separate files
 ///   * Apply the observable transformer on every Dart script.
 ///   * Inline imported html files
-///   * Combine scripts from multiple files into a single script tag
+///   * Combine scripts) from multiple files into a single script tag
 ///   * Inject extra polyfills needed to run on all browsers.
 ///
 /// At the end of these phases, this tranformer produces a single entrypoint
@@ -184,7 +367,8 @@ List<List<Transformer>> createDeployPhases(
  TransformOptions options, {String sdkDir}) {
  var phases = [
    [new polymer.PolymerTransformerGroup(options.polymerOptions)],
-   [new ChromeTransformer(options)]];
+   [new ChromeTransformer(options)],
+   [new CssImporter()]];
  return phases;
 }
 
