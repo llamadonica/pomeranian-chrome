@@ -110,7 +110,12 @@ class CssImporter extends Transformer {
         _shortnames[shortname] = url;
         _urls[url] = shortname;
         
-        http.get(url).then((response) {
+        var client = new http.Client();
+        var request = new http.Request('GET',Uri.parse(url));
+        request.headers["user-agent"] = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36";
+        client.send(request)
+        .then((stream) => http.Response.fromStream(stream))
+        .then((response) {
           transform.logger.info("$url => assets/downloads/$shortname.css");
           importCss(response.body, transform).then((newContent) {
             var newAsset = new Asset.fromString(
@@ -129,7 +134,7 @@ class CssImporter extends Transformer {
           completer.complete();
         }
       }
-      var newScript = "@import url('/assets/downloads/$shortname.css');";
+      var newScript = "@import url('assets/downloads/$shortname.css')";
       content = content.substring(0, match.start)
               + newScript + content.substring(match.end);
     }
@@ -159,8 +164,13 @@ class CssImporter extends Transformer {
             
         _shortnames[shortname] = url;
         _urls[url] = shortname;
-            
-        http.get(url).then((response) {
+        
+        var client = new http.Client();
+        var request = new http.Request('GET',Uri.parse(url));
+        request.headers["user-agent"] = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36";
+        client.send(request)
+        .then((stream) => http.Response.fromStream(stream))
+        .then((response) {
           transform.logger.info("$url => assets/downloads/$shortname");
           transform.addOutput(new Asset.fromString(
               new AssetId(
@@ -176,7 +186,7 @@ class CssImporter extends Transformer {
           completer.complete();
         }
       }
-      var newScript = "url('/assets/downloads/$shortname');";
+      var newScript = "url('./$shortname');";
       content = content.substring(0, match.start)
               + newScript + content.substring(match.end);
     }

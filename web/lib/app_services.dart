@@ -17,6 +17,7 @@ abstract class AppDelegate {
   bool get hasStorageCapabilities;
   bool get hasAlwaysOnTopCapabilities;
   bool get hasNotifyCapabilities;
+  bool get hasTickCapabilities;
   
   bool get tryNotifications;
   void set tryNotifications(bool value);
@@ -157,6 +158,11 @@ class JsAppDelegate extends AppDelegate {
   @override
   bool get doAlarmAudio=>
     _proxy.callMethod('getDoAlarmAudio',[]);
+
+  // TODO: implement hasTickCapabilities
+  @override
+  bool get hasTickCapabilities => 
+      _proxy.callMethod('getHasTickCapabilities',[]);
 }
 
 class _ChromeNotification extends AppNotification {

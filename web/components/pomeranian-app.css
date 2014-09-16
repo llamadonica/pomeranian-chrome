@@ -1,3 +1,9 @@
+@media only screen and (max-device-width: 480px) {
+  paper-toggle-button::shadow paper-radio-button::shadow #onRadio.fill {
+    transform: none;
+    -webkit-transform: none;
+  }
+}
 #title_id {
   font-size: 24pt;
   font-weight:bold;
@@ -16,19 +22,40 @@ body {
   font-size: 24pt;
   border-radius: 3px;
 }
-
+#animated_button_bar {
+  width: 200vw;
+  position: relative;
+}
+#animated_button_bar[animating] {
+  transition: transform 1s ease;
+}
+#animated_button_bar[active] {
+  transform: translate3d(-100vw,0,0);
+}
 #button_bar {
   margin-bottom: 1em;
   min-height:30px;
+}
+#button_bar_stopped {
+  width: 100vw;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+#button_bar_active {
+  width: 100vw;
+  position: absolute;
+  left: 100vw;
+  top: 0;
 }
 .button_holder {
   padding: 0 1.25em;
 }
 paper-button {
-  margin-left: 1em;
+  margin-right: 1em;
 }
 paper-button:first-child {
-  margin-left: 0;
+  margin-left: 1em;
 }
 paper-button[raisedButton] {
   color: white;

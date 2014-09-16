@@ -113,6 +113,11 @@
        return true;
      },
      getHasAlwaysOnTopCapabilities: function() {
+       if (typeof Cordova === 'undefined')
+         return true;
+       return false;
+     },
+     getHasTickCapabilities: function() {
        return true;
      },
      getHasNotifyCapabilities: function() {
@@ -141,6 +146,8 @@
      },
      setKeepOnTop: function(value) {
        this._keepOnTop = value;
+       if (typeof Cordova !== 'undefined') return;
+       
        var window = chrome.app.window.get('_mainWindow');
        if (window)
          window.setAlwaysOnTop(value > 0);
@@ -150,10 +157,10 @@
          '_POMERANIAN_NOTIFICATION_',
          { 
            type: 'basic',
-	   title: title,
-	   message: (options && options.body)?options.body:'',
-	   isClickable: true,
-	   iconUrl: (options && options.icon)?options.icon:''
+           title: title,
+           message: (options && options.body)?options.body:'',
+           isClickable: true,
+           iconUrl: (options && options.icon)?options.icon:''
          },
          function(_) {}
        );
@@ -181,11 +188,15 @@
        if (callback) callback(true);
      },
      setNotify: function () {
+       if (typeof Cordova !== 'undefined')
+         return;
        var window = chrome.app.window.get('_mainWindow');
        if (window)
          window.drawAttention();
      },
      clearNotify: function () {
+       if (typeof Cordova !== 'undefined')
+         return;
        var window = chrome.app.window.get('_mainWindow');
        if (window)
          window.clearAttention();

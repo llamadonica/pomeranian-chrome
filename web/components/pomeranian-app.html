@@ -8,7 +8,7 @@
 <link rel="import" href="packages/paper_elements/paper_item.html">
 <link rel="import" href="packages/paper_elements/paper_toggle_button.html">
 
-<link rel="import" href="../transitions/slide-from-right.html">
+<!--<link rel="import" href="../transitions/slide-from-right.html">-->
 <link rel="import" href="paper-tristate-toggle-button.html">
 
 <polymer-element name="pomeranian-app">
@@ -17,12 +17,12 @@
     <core-header-panel>
       <core-toolbar id="mainheader">
         <paper-menu-button icon="menu">
-          <paper-item label="Tick when active" on-tap="{{togglePlayTick}}">
-            <div flex></div>
-            <paper-toggle-button id="tick-audio-toggle" on-change="{{changePlayTick}}"
-                checked?="{{doTickAudio}}">
-            </paper-toggle-button>
-          </paper-item>
+            <paper-item label="Tick when active" on-tap="{{togglePlayTick}}">
+              <div flex></div>
+              <paper-toggle-button id="tick-audio-toggle" on-change="{{changePlayTick}}"
+                  checked?="{{doTickAudio}}">
+              </paper-toggle-button>
+            </paper-item>
           <template if="{{hasAlwaysOnTopCapabilities}}">
             <paper-item label="Keep window on top" on-tap="{{toggleKeepOnTop}}">
               <div class="keep_on_top_description">{{keepOnTopDescription}}</div>
@@ -33,14 +33,16 @@
               </paper-tristate-toggle-button>
             </paper-item>
           </template>
-          <div class="{{(hasAlwaysOnTopCapabilities?'':'first ') + 'paper_group_header'}}" style="background-color: #fff;">When time is up:</div>
+          <div class="paper_group_header" style="background-color: #fff;">When time is up:</div>
           <div class="paper_group">
-            <paper-item label="Show a notification" on-tap="{{toggleTryNotifications}}">
-              <div flex></div>
-              <paper-toggle-button id="try-notifications-toggle" on-change="{{changeTryNotifications}}"
-                  checked?="{{tryNotifications}}">
-              </paper-toggle-button>
-            </paper-item>
+            <template if="{{hasNotificationCapabilities}}">
+              <paper-item label="Show a notification" on-tap="{{toggleTryNotifications}}">
+                <div flex></div>
+                <paper-toggle-button id="try-notifications-toggle" on-change="{{changeTryNotifications}}"
+                    checked?="{{tryNotifications}}">
+                </paper-toggle-button>
+              </paper-item>
+            </template>
             <template if="{{hasNotifyCapabilities}}">
               <paper-item label="Flash the icon" on-tap="{{toggleTryNotify}}">
                 <div flex></div>
@@ -69,25 +71,17 @@
           <div flex></div>
         </div>
         <div layout id="button_bar">
-          <core-animated-pages selected="{{selected}}" transitions="slide-from-right">
-            <section id="stopped">
-               <div class="button_holder" layout horizontal slide-from-right>
-                  <paper-button flex raisedButton class="focused" label="Pomodoro"
-                     id="pomodoro_button_id" on-tap="{{pomodoroButton}}">
-                  </paper-button>
-                  <paper-button flex raisedButton id="short_button_id"
-                     label="Short Break" on-tap="{{shortBreakButton}}"></paper-button>
-                  <paper-button flex raisedButton id="long_button_id"
-                     label="Long Break"  on-tap="{{longBreakButton}}"></paper-button>
-               </div>
-            </section>
-            <section id="active">
-              <div class="button_holder" layout horizontal slide-from-right>
-                <paper-button flex raisedButton id="stop_button_id" label="Stop"
-                    on-tap="{{stopButton}}"></paper-button>
-              </div>
-            </section>
-          </core-animated-pages>
+          <div active?="{{active}}" animating?="{{animating}}" notap id="animated_button_bar" layout horizontal>
+            <div id="button_bar_stopped" layout horizontal>
+               <paper-button flex raisedbutton class="focused" label="Pomodoro" id="pomodoro_button_id" on-tap="{{ pomodoroButton }}"">
+               </paper-button>
+               <paper-button flex raisedbutton id="short_button_id" label="Short Break" on-tap="{{ shortBreakButton }}"></paper-button>
+               <paper-button flex raisedbutton id="long_button_id" label="Long Break" on-tap="{{ longBreakButton }}"></paper-button>
+             </div>
+             <div id="button_bar_active" layout horizontal>
+                <paper-button flex="" raisedbutton="" id="stop_button_id" label="Stop" on-tap="{{ stopButton }}"></paper-button>
+            </div>
+          </div>
         </div>
       </div>
     </core-header-panel>

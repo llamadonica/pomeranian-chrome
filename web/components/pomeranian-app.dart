@@ -16,7 +16,14 @@ class PomeranianApp extends PolymerElement with Observable {
   static const String WIND_UP_URI = "assets/sounds/wind.ogg";
   static const String TICKING_URI = "assets/sounds/tick-loop.ogg";
   
-  @observable int selected;
+  @observable bool active;
+  void activeChanged(bool oldValue) {
+    animating = true;
+    new Timer(new Duration(seconds: 1), () {
+      animating = false;
+    });
+  }
+  @observable bool animating;
   @observable String timeRemaining;
   @observable String status;
   
@@ -105,7 +112,7 @@ class PomeranianApp extends PolymerElement with Observable {
       var request_ticking = new HttpRequest();
       request_ticking.onLoad.listen((event) {
         audioContext.decodeAudioData(request_ticking.response).then((buffer) {
-          if (!doAlarmAudio) return;
+          if (!doTickAudio) return;
          
           _tickingLoop = audioContext.createBufferSource();
           _tickingLoop.buffer = buffer;
@@ -127,6 +134,8 @@ class PomeranianApp extends PolymerElement with Observable {
     _appDelegate.hasAlwaysOnTopCapabilities;
   bool get hasNotifyCapabilities =>
     _appDelegate.hasNotifyCapabilities;
+  bool get hasNotificationCapabilities =>
+    _appDelegate.hasNotificationCapabilities;
   
   bool canDoNotifications = false;
   bool get isAuthorizedForNotifications => 
@@ -135,9 +144,11 @@ class PomeranianApp extends PolymerElement with Observable {
   
   PomeranianApp.created() : super.created() {
     if (_appDelegate.hasStorageCapabilities) {
-      var enableNotifications = _appDelegate.getKey("$APP_NAME.notifications");
-      if (enableNotifications != null) {
-        _appDelegate.tryNotifications = tryNotifications = (enableNotifications == "true");
+      if (hasNotificationCapabilities) {
+        var enableNotifications = _appDelegate.getKey("$APP_NAME.notifications");
+        if (enableNotifications != null) {
+          _appDelegate.tryNotifications = tryNotifications = (enableNotifications == "true");
+        }
       }
       var enableAlarmAudio = _appDelegate.getKey("$APP_NAME.doAlarmAudio");
       if (enableAlarmAudio != null) {
@@ -193,7 +204,7 @@ class PomeranianApp extends PolymerElement with Observable {
       seconds %= 60;
       timeRemaining = "$minute:${seconds.toString().padLeft(2,'0')}";
       status = title;
-      selected = 1;
+      active = true;
       if (keepOnTop == 1)
         _appDelegate.keepOnTop = false;
       
@@ -203,7 +214,7 @@ class PomeranianApp extends PolymerElement with Observable {
         var request_ticking = new HttpRequest();
         request_ticking.onLoad.listen((event) {
           audioContext.decodeAudioData(request_ticking.response).then((buffer) {
-            if (!doAlarmAudio) return;
+            if (!doAlarmAudio || expires == null) return;
              
             _tickingLoop = audioContext.createBufferSource();
             _tickingLoop.buffer = buffer;
@@ -226,9 +237,9 @@ class PomeranianApp extends PolymerElement with Observable {
         });
       } else if (isAuthorizedForNotifications)
         canDoNotifications = true;
-      selected = 1;
+      active = true;
     } else {
-      selected = 0;
+      active = false;
       timeRemaining = "Stopped";
       status = "Pomeranian";
     }
@@ -276,9 +287,13 @@ class PomeranianApp extends PolymerElement with Observable {
     expires = null;
     timeRemaining = "Stopped";
     status = "Pomeranian";
-    selected = 0;
+    active = false;
     if (keepOnTop == 1)
       _appDelegate.keepOnTop = true;
+    if (_tickingLoop != null) {
+      _tickingLoop.stop(0);
+      _tickingLoop = null;
+    }
   }
   void setTimer(int timeInMinutes, String title, Event ev) {
     if (((ev.target as Node)
@@ -304,7 +319,7 @@ class PomeranianApp extends PolymerElement with Observable {
     });
     timeRemaining = "$timeInMinutes:00";
     status = title;
-    selected = 1;
+    active = true;
     if (keepOnTop == 1)
       _appDelegate.keepOnTop = false;
     
@@ -327,7 +342,7 @@ class PomeranianApp extends PolymerElement with Observable {
         buffers.sources[WIND_UP_URI].connectNode(audioContext.destination);
         new Timer(new Duration(milliseconds: 
             (buffers.sources[WIND_UP_URI].buffer.duration*1000).floor()),() {
-          if (!doAlarmAudio) return;
+          if (!doTickAudio || expires == null) return;
           _tickingLoop = buffers.sources[TICKING_URI];
           buffers.sources[TICKING_URI].connectNode(audioContext.destination);
           buffers.sources[TICKING_URI].loop = true;
@@ -364,7 +379,10 @@ class PomeranianApp extends PolymerElement with Observable {
   }
   void toggleKeepOnTop(Event ev) {
     PaperTristateToggleButton toggleButton = $['keep-on-top-toggle'];
-    if (ev.target == toggleButton) ev.stopPropagation();
+    if (ev.target == toggleButton) {
+      ev.stopPropagation();
+      return;
+    }
     
     toggleButton.state = (toggleButton.state + 1) % 3;
   }
@@ -373,7 +391,10 @@ class PomeranianApp extends PolymerElement with Observable {
   }
   void toggleTryNotify(Event ev) {
     PaperToggleButton toggleButton = $['try-notify-toggle'];
-    if (ev.target == toggleButton) return;
+    if (ev.target == toggleButton) {
+      ev.stopPropagation();
+      return;
+    }
       
     tryNotify = !tryNotify;
   }
@@ -382,7 +403,10 @@ class PomeranianApp extends PolymerElement with Observable {
   }
   void togglePlayBell(Event ev) {
     PaperToggleButton toggleButton = $['alarm-audio-toggle'];
-    if (ev.target == toggleButton) return;
+    if (ev.target == toggleButton) {
+      ev.stopPropagation();
+      return;
+    }
       
     doAlarmAudio = !doAlarmAudio;
   }
@@ -391,7 +415,10 @@ class PomeranianApp extends PolymerElement with Observable {
   }
   void togglePlayTick(Event ev) {
     PaperToggleButton toggleButton = $['tick-audio-toggle'];
-    if (ev.target == toggleButton) return;
+    if (ev.target == toggleButton) {
+      ev.stopPropagation();
+      return;
+    }
       
     doTickAudio = !doTickAudio;
   }
@@ -404,6 +431,7 @@ class _HTML5AppDelegate extends AppDelegate {
   bool _canDoNotifications = false;
   bool _tryNotifications = true;
   bool _doAlarmAudio = false;
+  static const String MOBILE_TEST_STRING = r'''(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-'''; 
   
   _HTML5AppDelegate() : super();
   
@@ -430,9 +458,30 @@ class _HTML5AppDelegate extends AppDelegate {
                   iconUrl: icon);
     return new _HTML5AppNotification(notification);
   }
+  
+  bool _isMobile;
+  bool get isMobile {
+    if (_isMobile == null) {
+      var regex = new RegExp(MOBILE_TEST_STRING, caseSensitive: false);
+      String agentString;
+      if (window.navigator == null || 
+          (window.navigator.userAgent == null &&
+           window.navigator.vendor == null)) {
+        //agentString = window.opera;
+        agentString = '';
+      } else if (window.navigator.userAgent == null) {
+        agentString = window.navigator.vendor;
+      } else {
+        agentString = window.navigator.userAgent;
+      }
+      _isMobile = regex.hasMatch(agentString.substring(0,4));
+    }
+    return _isMobile;
+  }
 
   @override
-  bool get hasNotificationCapabilities => true;
+  bool get hasNotificationCapabilities => 
+    context.hasProperty('Notification');
 
   @override String getKey(String key) {
     if (!window.localStorage.containsKey(key))
@@ -501,6 +550,9 @@ class _HTML5AppDelegate extends AppDelegate {
   void set doAlarmAudio(bool value) {
     _doAlarmAudio = value;
   }
+
+  @override
+  bool get hasTickCapabilities => true;
 }
 class _HTML5AppNotification extends AppNotification {
   final Notification _delegate;
