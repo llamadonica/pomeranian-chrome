@@ -20,6 +20,16 @@
  * 
  */
  (function() {
+   var suspendApp = function () {
+     window.console.log("Sleeping.");
+     windowIsActive = false;
+     if (appDelegate.alarm)
+       chrome.alarms.create(
+         (appDelegate.getTryNotifications()?'':'#') + 
+         (appDelegate.getDoAlarmAudio()?'$':'') + 
+         appDelegate.alarm.status,
+         { when: appDelegate.alarm.time});
+   }
    var performLaunch = function() {
     chrome.runtime.getPlatformInfo(function (platformInfo) {
       var frameType;
@@ -55,16 +65,8 @@
             appWindow.contentWindow.appDelegate = appDelegate;
             windowIsActive = true;
             chrome.alarms.clearAll();
-	    
-            appWindow.onClosed.addListener(function () {
-              windowIsActive = false;
-              if (appDelegate.alarm)
-                chrome.alarms.create(
-                  (appDelegate.getTryNotifications()?'':'#') + 
-                  (appDelegate.getDoAlarmAudio()?'$':'') + 
-                  appDelegate.alarm.status,
-                  { when: appDelegate.alarm.time});
-            });
+	          if (typeof Cordova === 'undefined')
+	            appWindow.onClosed.addListener(suspendApp);
           });
         });
      });
@@ -212,6 +214,15 @@
     appDelegate.storage = keys['_APP_'];
   });
   chrome.app.runtime.onLaunched.addListener(performLaunch);
+  if (typeof Cordova !== 'undefined') {
+    window.console.log("Setting up listeners.");
+    chrome.runtime.onSuspend.addListener(suspendApp);
+    chrome.runtime.onSuspendCanceled.addListener(function() {
+      window.console.log("Waking up.");
+      windowIsActive = true;
+      chrome.alarms.clearAll();
+    });
+  } 
   
   chrome.notifications.onClicked.addListener(allNotifications.handleClick);
 })();
@@ -257,6 +268,11 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
     request.responseType = 'arraybuffer';
     request.open('GET', uri, true);
     request.send();
-    
   }
+});
+chrome.runtime.onSuspend.addListener(function() {
+  window.console.log("Suspending on line 274.");
+});
+chrome.runtime.onSuspendCanceled.addListener(function() {
+  window.console.log("Suspend resumed on line 277.");
 });

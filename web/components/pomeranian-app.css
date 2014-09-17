@@ -114,3 +114,7 @@ paper-tristate-toggle-button::shadow #toggleBar[status="1"] {
 paper-menu-button::shadow core-popup-menu::shadow #menu {
   overflow: hidden;
 }
+core-header-panel > div {
+  overflow: hidden;
+}
+}

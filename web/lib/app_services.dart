@@ -39,7 +39,7 @@ abstract class AppDelegate {
   String get status;
   
   void postAlarm(DateTime alarm, String status);
-  void removeAlarm(DateTime alarm);
+  void removeAlarm();
   
   void storeKey(String key, String value);
   String getKey(String key);
@@ -105,8 +105,8 @@ class JsAppDelegate extends AppDelegate {
       _proxy.callMethod('postAlarm',[alarm.millisecondsSinceEpoch, status]);
 
   @override
-  void removeAlarm(DateTime alarm) =>
-    _proxy.callMethod('removeAlarm',[alarm.millisecondsSinceEpoch]);
+  void removeAlarm() =>
+    _proxy.callMethod('removeAlarm',[]);
 
   @override
   void storeKey(String key, String value) =>

@@ -26,6 +26,11 @@ class PomeranianApp extends PolymerElement with Observable {
   @observable bool animating;
   @observable String timeRemaining;
   @observable String status;
+  @observable bool fontsLoading = true;
+  
+  void setFontsReady () {
+    fontsLoading = false;
+  }
   
   DateTime expires = null;
   
@@ -281,7 +286,7 @@ class PomeranianApp extends PolymerElement with Observable {
     if (endOfTimer != null)
       endOfTimer.cancel();
     
-    _appDelegate.removeAlarm(expires);
+    _appDelegate.removeAlarm();
     
     endOfTimer = null;
     expires = null;
@@ -505,7 +510,7 @@ class _HTML5AppDelegate extends AppDelegate {
   }
 
   @override
-  void removeAlarm(DateTime alarm) {
+  void removeAlarm() {
     // Do nothing
   }
 
