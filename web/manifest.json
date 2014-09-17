@@ -23,7 +23,8 @@
     "app.window.alwaysOnTop",
     "alarms",
     "notifications",
-    "storage"
+    "storage",
+    "http://fonts.googleapis.com/"
   ],
   "offline_enabled": true
 }

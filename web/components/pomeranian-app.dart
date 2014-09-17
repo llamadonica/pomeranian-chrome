@@ -26,6 +26,11 @@ class PomeranianApp extends PolymerElement with Observable {
   @observable bool animating;
   @observable String timeRemaining;
   @observable String status;
+  @observable bool fontsLoading = true;
+  
+  void setFontsReady () {
+    fontsLoading = false;
+  }
   
   DateTime expires = null;
   
