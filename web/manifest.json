@@ -1,6 +1,6 @@
 {
   "name": "Pomeranian",
-  "version": "1.1.5",
+  "version": "1.2.0",
   "manifest_version": 2,
     
   "description": "A simple pomodoro timer for Chrome.",
@@ -24,7 +24,8 @@
     "alarms",
     "notifications",
     "storage",
-    "http://fonts.googleapis.com/"
+    "http://fonts.googleapis.com/",
+    "http://fonts.gstatic.com/"
   ],
   "offline_enabled": true,
   "key": "aladpffdiiblafaglejaglmcmjlnggao"
